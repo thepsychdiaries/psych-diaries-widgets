@@ -4,360 +4,212 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Psych Diaries • Teddy Jar Pomodoro</title>
+
   <style>
     :root{
-      --bg:#ffffff;
-      --ink:#232323;
+      --w: 360px;
+      --h: 560px;
 
-      /* palette */
-      --sage:#8aa89b;
-      --sage2:#cfe1d8;
-      --sage3:#6f9284;
+      /* tweak these if your bg.png has different proportions */
+      --bgPad: 16px;
 
-      /* logo-ish warmth (optional accents) */
-      --rose:#b06b5a;
+      /* liquid overlay placement (tune later if you want progress tint) */
+      --liquidLeft: 56px;
+      --liquidTop: 242px;
+      --liquidWidth: 248px;
+      --liquidHeight: 150px;
 
-      --glass: rgba(138,168,155,0.10);
-      --stroke: rgba(0,0,0,0.14);
       --shadow: 0 14px 32px rgba(0,0,0,0.12);
-      --radius: 22px;
+      --radius: 28px;
+      --ink: #1f1f1f;
     }
 
     body{
       margin:0;
-      background:transparent;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color: var(--ink);
+      background: transparent;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
 
     .card{
-      width: 360px;
-      height: 470px;
-      background: var(--bg);
+      width: var(--w);
+      height: var(--h);
+      position: relative;
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,0.06);
       overflow: hidden;
-      position: relative;
-    }
-
-    .top{
-      padding: 16px 16px 10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-    }
-
-    .title{
-      font-weight: 650;
-      letter-spacing: 0.2px;
-      font-size: 13px;
-      color: rgba(0,0,0,0.72);
-      line-height: 1.1;
-    }
-
-    .pill{
-      font-size: 12px;
-      border: 1px solid rgba(0,0,0,0.10);
-      background: rgba(138,168,155,0.12);
-      color: rgba(0,0,0,0.70);
-      padding: 6px 10px;
-      border-radius: 999px;
-      cursor:pointer;
-      user-select:none;
-      white-space: nowrap;
-    }
-
-    .center{
-      padding: 6px 16px 0 16px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap: 10px;
-    }
-
-    .timer{
-      font-variant-numeric: tabular-nums;
-      font-size: 40px;
-      font-weight: 750;
-      letter-spacing: 0.5px;
-    }
-
-    .sub{
-      font-size: 12px;
-      color: rgba(0,0,0,0.55);
-      margin-top: -6px;
-    }
-
-    .jar-wrap{
-      margin-top: 6px;
-      width: 300px;
-      height: 290px;
-      position: relative;
-    }
-
-    /* ===== Cute collar ===== */
-    .collar{
-      position:absolute;
-      left: 50%;
-      top: 96px;
-      transform: translateX(-50%);
-      width: 220px;
-      height: 120px;
-      pointer-events:none;
-    }
-
-    .tag{
-      position:absolute;
-      left: 50%;
-      top: 28px;
-      transform: translateX(-50%) rotate(-4deg);
-      width: 122px;
-      height: 122px;
-      border-radius: 999px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.14));
-    }
-
-    .tag .ring{
-      position:absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.85);
-      border: 2px solid rgba(0,0,0,0.10);
-    }
-
-    .tag .shine{
-      position:absolute;
-      inset: 8px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.70), rgba(255,255,255,0.0) 55%);
-      pointer-events:none;
-    }
-
-    .tag img{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.95);
-      border: 1px solid rgba(0,0,0,0.08);
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    .controls{
-      margin-top: 10px;
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
-
-    button{
-      border: 1px solid rgba(0,0,0,0.12);
+      box-shadow: var(--shadow);
       background: #fff;
-      padding: 10px 12px;
-      border-radius: 14px;
-      cursor:pointer;
-      font-weight: 650;
-      font-size: 13px;
-    }
-    button.primary{
-      background: rgba(138,168,155,0.18);
-      border-color: rgba(138,168,155,0.55);
-    }
-    button.danger{
-      background: rgba(176,107,90,0.10);
-      border-color: rgba(176,107,90,0.40);
+      border: 1px solid rgba(0,0,0,0.06);
     }
 
-    .footer{
-      padding: 10px 16px 16px 16px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-size: 12px;
-      color: rgba(0,0,0,0.55);
+    /* The mockup background */
+    .bg{
+      position:absolute; inset:0;
+      background: url("bg.png") center/cover no-repeat;
     }
-    .tiny{
-      font-size: 11px;
+
+    /* Optional: progress tint overlay on the liquid (makes it feel alive) */
+    .liquidTint{
+      position:absolute;
+      left: var(--liquidLeft);
+      top: var(--liquidTop);
+      width: var(--liquidWidth);
+      height: var(--liquidHeight);
+      border-radius: 22px;
+      pointer-events:none;
+      background: rgba(138,168,155,0.0); /* starts transparent */
+      filter: blur(0.2px);
+      mix-blend-mode: multiply;
+    }
+
+    /* Timer + mode text overlay (we place them exactly where mockup expects) */
+    .time{
+      position:absolute;
+      left: 50%;
+      top: 408px;
+      transform: translateX(-50%);
+      font-variant-numeric: tabular-nums;
+      font-size: 54px;
+      font-weight: 800;
+      color: rgba(0,0,0,0.70);
+      text-shadow: 0 2px 12px rgba(255,255,255,0.8);
+      letter-spacing: 0.5px;
+      pointer-events:none;
+      user-select:none;
+    }
+    .mode{
+      position:absolute;
+      left: 50%;
+      top: 472px;
+      transform: translateX(-50%);
+      font-size: 18px;
+      font-weight: 550;
       color: rgba(0,0,0,0.45);
+      pointer-events:none;
+      user-select:none;
     }
+
+    /* REAL buttons overlayed (transparent, but accurate) */
+    .btn{
+      position:absolute;
+      border:none;
+      background: rgba(255,255,255,0.0);
+      cursor:pointer;
+      border-radius: 999px;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    /* Sound button (top right) */
+    #soundBtn{
+      top: 64px;
+      right: 24px;
+      width: 132px;
+      height: 40px;
+    }
+
+    /* Bottom row buttons (match your mockup layout) */
+    #pauseBtn{
+      left: 26px;
+      bottom: 78px;
+      width: 148px;
+      height: 54px;
+      border-radius: 20px;
+    }
+    #resetBtn{
+      left: 186px;
+      bottom: 78px;
+      width: 118px;
+      height: 54px;
+      border-radius: 20px;
+    }
+
+    /* Toggle segmented control on right */
+    #breakBtn{
+      left: 212px;
+      bottom: 78px;
+      width: 82px;
+      height: 54px;
+      border-radius: 20px 0 0 20px;
+      display:none; /* we’ll use the combined control below instead */
+    }
+    #focusBtn{
+      left: 294px;
+      bottom: 78px;
+      width: 82px;
+      height: 54px;
+      border-radius: 0 20px 20px 0;
+      display:none;
+    }
+
+    /* Better: use two transparent halves over the segment */
+    #breakHalf{
+      left: 246px;
+      bottom: 78px;
+      width: 78px;
+      height: 54px;
+      border-radius: 0;
+    }
+    #focusHalf{
+      left: 324px;
+      bottom: 78px;
+      width: 78px;
+      height: 54px;
+      border-radius: 0;
+    }
+
+    /* Status text (bottom left) */
+    .status{
+      position:absolute;
+      left: 22px;
+      bottom: 18px;
+      font-size: 16px;
+      color: rgba(0,0,0,0.35);
+      user-select:none;
+      pointer-events:none;
+    }
+
+    /* Small helper: if you want visible debug outlines, set to 1 */
+    .debug .btn{ outline: 2px dashed rgba(255,0,0,0.25); }
+    .debug .liquidTint{ outline: 2px dashed rgba(0,200,0,0.25); }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <div class="top">
-      <div class="title">Psych Diaries • Teddy Jar Pomodoro</div>
-      <div class="pill" id="soundBtn" title="Click once to allow end sound">🔊 Enable sound</div>
-    </div>
+  <div class="card" id="card">
+    <div class="bg"></div>
 
-    <div class="center">
-      <div class="timer" id="timeTxt">25:00</div>
-      <div class="sub" id="modeTxt">Focus</div>
+    <!-- optional progress tint overlay (we animate this) -->
+    <div class="liquidTint" id="liquidTint"></div>
 
-      <div class="jar-wrap">
-        <!-- Teddy-bear jar SVG -->
-        <svg width="300" height="290" viewBox="0 0 300 290" aria-label="Teddy jar">
-          <defs>
-            <!-- Teddy silhouette clip for water -->
-            <clipPath id="teddyClip">
-              <!-- More teddy-like: clear ears, rounder head, softer belly -->
-              <path d="
-                M88,74
-                C70,66 58,52 62,38
-                C66,24 84,24 98,40
-                C104,18 124,8 150,8
-                C176,8 196,18 202,40
-                C216,24 234,24 238,38
-                C242,52 230,66 212,74
-                C238,92 252,120 252,150
-                C252,208 212,248 150,248
-                C88,248 48,208 48,150
-                C48,120 62,92 88,74
-                Z" />
-            </clipPath>
+    <div class="time" id="timeTxt">25:00</div>
+    <div class="mode" id="modeTxt">Focus</div>
+    <div class="status" id="statusTxt">Ready…</div>
 
-            <!-- Glass highlight gradient -->
-            <linearGradient id="glassGrad" x1="0" x2="1">
-              <stop offset="0" stop-color="rgba(255,255,255,0.65)"/>
-              <stop offset="0.45" stop-color="rgba(255,255,255,0.10)"/>
-              <stop offset="1" stop-color="rgba(255,255,255,0.45)"/>
-            </linearGradient>
+    <!-- real clickable areas -->
+    <button class="btn" id="soundBtn" aria-label="Enable sound"></button>
 
-            <!-- Water gradient -->
-            <linearGradient id="waterGrad" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stop-color="rgba(138,168,155,0.92)"/>
-              <stop offset="1" stop-color="rgba(207,225,216,0.92)"/>
-            </linearGradient>
+    <button class="btn" id="pauseBtn" aria-label="Pause"></button>
+    <button class="btn" id="resetBtn" aria-label="Reset"></button>
 
-            <!-- Soft inner shadow feel -->
-            <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.10)"/>
-            </filter>
-          </defs>
+    <button class="btn" id="breakHalf" aria-label="Break (5)"></button>
+    <button class="btn" id="focusHalf" aria-label="Focus (25)"></button>
 
-          <!-- Teddy glass body -->
-          <path d="
-            M88,74
-            C70,66 58,52 62,38
-            C66,24 84,24 98,40
-            C104,18 124,8 150,8
-            C176,8 196,18 202,40
-            C216,24 234,24 238,38
-            C242,52 230,66 212,74
-            C238,92 252,120 252,150
-            C252,208 212,248 150,248
-            C88,248 48,208 48,150
-            C48,120 62,92 88,74
-            Z"
-            fill="rgba(138,168,155,0.08)"
-            stroke="rgba(0,0,0,0.14)"
-            stroke-width="2"
-            filter="url(#softShadow)"
-          />
-
-          <!-- Teddy face hint (super subtle: nose dot + blush dots) -->
-          <circle cx="150" cy="120" r="3.5" fill="rgba(0,0,0,0.16)"/>
-          <circle cx="128" cy="128" r="4" fill="rgba(176,107,90,0.12)"/>
-          <circle cx="172" cy="128" r="4" fill="rgba(176,107,90,0.12)"/>
-
-          <!-- Water -->
-          <g clip-path="url(#teddyClip)">
-            <rect id="waterRect" x="0" y="248" width="300" height="340" fill="url(#waterGrad)"></rect>
-            <path id="wave"
-              d="M0,190 C40,180 60,200 100,190 C140,180 160,200 200,190 C240,180 260,200 300,190 L300,340 L0,340 Z"
-              fill="rgba(255,255,255,0.18)"
-              opacity="0.65"
-            />
-          </g>
-
-          <!-- Lid / rim -->
-          <path d="M108,62 C128,46 172,46 192,62" fill="none" stroke="rgba(0,0,0,0.13)" stroke-width="7" stroke-linecap="round"/>
-          <path d="M112,64 C130,52 170,52 188,64" fill="none" stroke="rgba(255,255,255,0.40)" stroke-width="4" stroke-linecap="round"/>
-
-          <!-- Glass highlight stroke -->
-          <path d="M98,92 C82,110 80,130 80,150 C80,198 110,228 146,238"
-            fill="none" stroke="url(#glassGrad)" stroke-width="10" stroke-linecap="round" opacity="0.95"
-          />
-        </svg>
-
-        <!-- Cute collar ribbon + tag -->
-        <div class="collar" aria-hidden="true">
-          <!-- ribbon -->
-          <svg width="220" height="120" viewBox="0 0 220 120">
-            <defs>
-              <linearGradient id="ribbonGrad" x1="0" x2="1">
-                <stop offset="0" stop-color="rgba(138,168,155,0.75)"/>
-                <stop offset="1" stop-color="rgba(207,225,216,0.85)"/>
-              </linearGradient>
-            </defs>
-
-            <!-- ribbon band -->
-            <path d="M20,40 C60,10 160,10 200,40
-                     C184,58 154,70 110,70
-                     C66,70 36,58 20,40 Z"
-                  fill="url(#ribbonGrad)" stroke="rgba(0,0,0,0.08)" stroke-width="1.2" />
-
-            <!-- little knot -->
-            <path d="M92,52 C98,44 122,44 128,52
-                     C120,64 100,64 92,52 Z"
-                  fill="rgba(111,146,132,0.55)" opacity="0.85"/>
-
-            <!-- tiny stitching line -->
-            <path d="M32,40 C70,22 150,22 188,40" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
-          </svg>
-
-          <div class="tag">
-            <div class="ring"></div>
-            <img src="logo.png" alt="Psych Diaries logo tag">
-            <div class="shine"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button class="primary" id="startBtn">Start</button>
-        <button id="pauseBtn">Pause</button>
-        <button class="danger" id="resetBtn">Reset</button>
-        <button id="breakBtn" title="Switch to 5-min break">Break (5)</button>
-        <button id="focusBtn" title="Back to 25-min focus">Focus (25)</button>
-      </div>
-    </div>
-
-    <div class="footer">
-      <div id="statusTxt" class="tiny">Ready.</div>
-      <div class="tiny">© Psych Diaries</div>
-    </div>
+    <audio id="ding" preload="auto">
+      <source src="ding.mp3" type="audio/mpeg">
+    </audio>
   </div>
-
-  <audio id="ding" preload="auto">
-    <source src="ding.mp3" type="audio/mpeg">
-  </audio>
 
   <script>
     const timeTxt = document.getElementById('timeTxt');
     const modeTxt = document.getElementById('modeTxt');
     const statusTxt = document.getElementById('statusTxt');
-    const waterRect = document.getElementById('waterRect');
-    const wave = document.getElementById('wave');
-
-    const startBtn = document.getElementById('startBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const breakBtn = document.getElementById('breakBtn');
-    const focusBtn = document.getElementById('focusBtn');
+    const liquidTint = document.getElementById('liquidTint');
 
     const soundBtn = document.getElementById('soundBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const breakHalf = document.getElementById('breakHalf');
+    const focusHalf = document.getElementById('focusHalf');
+
     const ding = document.getElementById('ding');
 
     let soundEnabled = false;
@@ -377,38 +229,35 @@
       return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     }
 
+    function applyModeLabel(){
+      modeTxt.textContent = (mode === 'focus') ? 'Focus' : 'Break';
+      // different tint colour by mode
+      liquidTint.style.background = (mode === 'focus')
+        ? 'rgba(138,168,155,0.0)'
+        : 'rgba(207,225,216,0.0)';
+    }
+
     function setMode(newMode){
       mode = newMode;
       totalSeconds = (mode === 'focus') ? 25*60 : 5*60;
       remainingSeconds = totalSeconds;
-      running = false;
-      startedAt = null;
-      remainingAtStart = null;
-      modeTxt.textContent = (mode === 'focus') ? 'Focus' : 'Break';
-      statusTxt.textContent = 'Ready.';
+      stop();
+      applyModeLabel();
       updateUI(0);
+      statusTxt.textContent = 'Ready…';
     }
 
     function updateUI(progress){
       timeTxt.textContent = fmt(remainingSeconds);
 
-      // Teddy bottom is ~248. Top cap is ~20.
-      const bottomY = 248;
-      const topY = 22;
-      const y = bottomY - (bottomY - topY) * progress;
-      waterRect.setAttribute('y', y);
-
-      // Gentle wave bob
-      const waveBase = y - 10;
-      const t = Date.now() / 820;
-      const wobble = Math.sin(t) * 4.2;
-      wave.setAttribute('d',
-        `M0,${waveBase+wobble}
-         C40,${waveBase-10+wobble} 60,${waveBase+10+wobble} 100,${waveBase+wobble}
-         C140,${waveBase-10+wobble} 160,${waveBase+10+wobble} 200,${waveBase+wobble}
-         C240,${waveBase-10+wobble} 260,${waveBase+10+wobble} 300,${waveBase+wobble}
-         L300,340 L0,340 Z`
-      );
+      // Progress tint: 0 -> 0.28 opacity (subtle)
+      const max = 0.28;
+      const op = Math.max(0, Math.min(max, progress * max));
+      if(mode === 'focus'){
+        liquidTint.style.background = `rgba(138,168,155,${op.toFixed(3)})`;
+      } else {
+        liquidTint.style.background = `rgba(207,225,216,${op.toFixed(3)})`;
+      }
     }
 
     function tick(){
@@ -422,16 +271,14 @@
       updateUI(progress);
 
       if(remainingSeconds <= 0){
-        running = false;
+        stop();
         statusTxt.textContent = 'Done!';
-
         if(soundEnabled){
           ding.currentTime = 0;
           ding.play().catch(()=>{});
         }
         return;
       }
-
       rafId = requestAnimationFrame(tick);
     }
 
@@ -444,42 +291,57 @@
       rafId = requestAnimationFrame(tick);
     }
 
-    function pause(){
-      if(!running) return;
+    function stop(){
       running = false;
       if(rafId) cancelAnimationFrame(rafId);
       rafId = null;
+      startedAt = null;
+      remainingAtStart = null;
+    }
+
+    function pause(){
+      if(!running) return;
+      stop();
       statusTxt.textContent = 'Paused.';
     }
 
     function reset(){
-      running = false;
-      if(rafId) cancelAnimationFrame(rafId);
-      rafId = null;
+      stop();
       remainingSeconds = totalSeconds;
-      statusTxt.textContent = 'Reset.';
       updateUI(0);
+      statusTxt.textContent = 'Reset.';
     }
 
+    // IMPORTANT: autoplay is blocked until a user gesture; this “arms” it
     soundBtn.addEventListener('click', async () => {
       try{
         await ding.play();
         ding.pause();
         ding.currentTime = 0;
         soundEnabled = true;
-        soundBtn.textContent = '🔊 Sound on';
         statusTxt.textContent = 'Sound enabled.';
       }catch(e){
         statusTxt.textContent = 'Click again to enable sound.';
       }
     });
 
-    startBtn.addEventListener('click', start);
-    pauseBtn.addEventListener('click', pause);
-    resetBtn.addEventListener('click', reset);
-    breakBtn.addEventListener('click', () => setMode('break'));
-    focusBtn.addEventListener('click', () => setMode('focus'));
+    // In your mockup, the left green button is “Pause”,
+    // but most users also expect Start. We do this:
+    // - first click starts
+    // - while running, click pauses
+    // That matches the UI without adding a separate Start button.
+    pauseBtn.addEventListener('click', () => {
+      if(running) pause();
+      else start();
+    });
 
+    resetBtn.addEventListener('click', reset);
+
+    breakHalf.addEventListener('click', () => setMode('break'));
+    focusHalf.addEventListener('click', () => setMode('focus'));
+
+    // init
+    applyModeLabel();
     updateUI(0);
   </script>
 </body>
