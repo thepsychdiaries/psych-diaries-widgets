@@ -3,346 +3,139 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Psych Diaries • Teddy Jar Pomodoro</title>
-
-  <style>
-    :root{
-      --w: 360px;
-      --h: 560px;
-
-      /* tweak these if your bg.png has different proportions */
-      --bgPad: 16px;
-
-      /* liquid overlay placement (tune later if you want progress tint) */
-      --liquidLeft: 56px;
-      --liquidTop: 242px;
-      --liquidWidth: 248px;
-      --liquidHeight: 150px;
-
-      --shadow: 0 14px 32px rgba(0,0,0,0.12);
-      --radius: 28px;
-      --ink: #1f1f1f;
-    }
-
-    body{
-      margin:0;
-      background: transparent;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-
-    .card{
-      width: var(--w);
-      height: var(--h);
-      position: relative;
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      background: #fff;
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-
-    /* The mockup background */
-    .bg{
-      position:absolute; inset:0;
-      background: url("bg.png") center/cover no-repeat;
-    }
-
-    /* Optional: progress tint overlay on the liquid (makes it feel alive) */
-    .liquidTint{
-      position:absolute;
-      left: var(--liquidLeft);
-      top: var(--liquidTop);
-      width: var(--liquidWidth);
-      height: var(--liquidHeight);
-      border-radius: 22px;
-      pointer-events:none;
-      background: rgba(138,168,155,0.0); /* starts transparent */
-      filter: blur(0.2px);
-      mix-blend-mode: multiply;
-    }
-
-    /* Timer + mode text overlay (we place them exactly where mockup expects) */
-    .time{
-      position:absolute;
-      left: 50%;
-      top: 408px;
-      transform: translateX(-50%);
-      font-variant-numeric: tabular-nums;
-      font-size: 54px;
-      font-weight: 800;
-      color: rgba(0,0,0,0.70);
-      text-shadow: 0 2px 12px rgba(255,255,255,0.8);
-      letter-spacing: 0.5px;
-      pointer-events:none;
-      user-select:none;
-    }
-    .mode{
-      position:absolute;
-      left: 50%;
-      top: 472px;
-      transform: translateX(-50%);
-      font-size: 18px;
-      font-weight: 550;
-      color: rgba(0,0,0,0.45);
-      pointer-events:none;
-      user-select:none;
-    }
-
-    /* REAL buttons overlayed (transparent, but accurate) */
-    .btn{
-      position:absolute;
-      border:none;
-      background: rgba(255,255,255,0.0);
-      cursor:pointer;
-      border-radius: 999px;
-    }
-    .btn:active{ transform: translateY(1px); }
-
-    /* Sound button (top right) */
-    #soundBtn{
-      top: 64px;
-      right: 24px;
-      width: 132px;
-      height: 40px;
-    }
-
-    /* Bottom row buttons (match your mockup layout) */
-    #pauseBtn{
-      left: 26px;
-      bottom: 78px;
-      width: 148px;
-      height: 54px;
-      border-radius: 20px;
-    }
-    #resetBtn{
-      left: 186px;
-      bottom: 78px;
-      width: 118px;
-      height: 54px;
-      border-radius: 20px;
-    }
-
-    /* Toggle segmented control on right */
-    #breakBtn{
-      left: 212px;
-      bottom: 78px;
-      width: 82px;
-      height: 54px;
-      border-radius: 20px 0 0 20px;
-      display:none; /* we’ll use the combined control below instead */
-    }
-    #focusBtn{
-      left: 294px;
-      bottom: 78px;
-      width: 82px;
-      height: 54px;
-      border-radius: 0 20px 20px 0;
-      display:none;
-    }
-
-    /* Better: use two transparent halves over the segment */
-    #breakHalf{
-      left: 246px;
-      bottom: 78px;
-      width: 78px;
-      height: 54px;
-      border-radius: 0;
-    }
-    #focusHalf{
-      left: 324px;
-      bottom: 78px;
-      width: 78px;
-      height: 54px;
-      border-radius: 0;
-    }
-
-    /* Status text (bottom left) */
-    .status{
-      position:absolute;
-      left: 22px;
-      bottom: 18px;
-      font-size: 16px;
-      color: rgba(0,0,0,0.35);
-      user-select:none;
-      pointer-events:none;
-    }
-
-    /* Small helper: if you want visible debug outlines, set to 1 */
-    .debug .btn{ outline: 2px dashed rgba(255,0,0,0.25); }
-    .debug .liquidTint{ outline: 2px dashed rgba(0,200,0,0.25); }
-  </style>
+  <title>Teddy Pomodoro</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <div class="card" id="card">
-    <div class="bg"></div>
+  <main class="card" role="application" aria-label="Teddy Pomodoro Timer">
+    <header class="top">
+      <div class="brand">Psych Diaries • Teddy Pomodoro</div>
 
-    <!-- optional progress tint overlay (we animate this) -->
-    <div class="liquidTint" id="liquidTint"></div>
+      <!-- Sound toggle (uses ding.mp3). Your script can toggle data-sound + button text. -->
+      <button class="modePill" id="soundToggle" type="button" aria-pressed="true" data-sound="on" title="Toggle sound">
+        🔊 Sound on
+      </button>
+    </header>
 
-    <div class="time" id="timeTxt">25:00</div>
-    <div class="mode" id="modeTxt">Focus</div>
-    <div class="status" id="statusTxt">Ready…</div>
+    <section class="teddyWrap" aria-label="Teddy progress display">
+      <!-- Teddy SVG: we “fill” a rectangle that is clipped to the teddy silhouette -->
+      <svg class="teddy" viewBox="0 0 320 360" aria-hidden="true">
+        <defs>
+          <!-- A simple teddy silhouette used as a clip path -->
+          <clipPath id="teddyClip">
+            <!-- head -->
+            <circle cx="160" cy="110" r="70"></circle>
+            <!-- ears -->
+            <circle cx="105" cy="70" r="30"></circle>
+            <circle cx="215" cy="70" r="30"></circle>
+            <!-- body -->
+            <ellipse cx="160" cy="235" rx="95" ry="110"></ellipse>
+            <!-- feet -->
+            <ellipse cx="105" cy="315" rx="45" ry="30"></ellipse>
+            <ellipse cx="215" cy="315" rx="45" ry="30"></ellipse>
+          </clipPath>
 
-    <!-- real clickable areas -->
-    <button class="btn" id="soundBtn" aria-label="Enable sound"></button>
+          <!-- a soft glassy highlight -->
+          <linearGradient id="shine" x1="0" x2="1">
+            <stop offset="0" stop-color="rgba(255,255,255,0.70)" />
+            <stop offset="0.35" stop-color="rgba(255,255,255,0.10)" />
+            <stop offset="1" stop-color="rgba(255,255,255,0.00)" />
+          </linearGradient>
 
-    <button class="btn" id="pauseBtn" aria-label="Pause"></button>
-    <button class="btn" id="resetBtn" aria-label="Reset"></button>
+          <!-- Clip for the circular collar tag (so logo stays inside the circle) -->
+          <clipPath id="tagClip">
+            <circle cx="160" cy="242" r="22"></circle>
+          </clipPath>
+        </defs>
 
-    <button class="btn" id="breakHalf" aria-label="Break (5)"></button>
-    <button class="btn" id="focusHalf" aria-label="Focus (25)"></button>
+        <!-- background teddy base -->
+        <g opacity="1">
+          <g class="teddyBase">
+            <circle cx="160" cy="110" r="70"></circle>
+            <circle cx="105" cy="70" r="30"></circle>
+            <circle cx="215" cy="70" r="30"></circle>
+            <ellipse cx="160" cy="235" rx="95" ry="110"></ellipse>
+            <ellipse cx="105" cy="315" rx="45" ry="30"></ellipse>
+            <ellipse cx="215" cy="315" rx="45" ry="30"></ellipse>
+          </g>
 
-    <audio id="ding" preload="auto">
-      <source src="ding.mp3" type="audio/mpeg">
-    </audio>
-  </div>
+          <!-- fill layer (clipped to teddy shape) -->
+          <g clip-path="url(#teddyClip)">
+            <rect id="fillRect" x="0" y="360" width="320" height="0" class="fillRect"></rect>
+            <!-- shine overlay -->
+            <rect x="60" y="60" width="70" height="260" fill="url(#shine)" opacity="0.55"></rect>
+          </g>
 
-  <script>
-    const timeTxt = document.getElementById('timeTxt');
-    const modeTxt = document.getElementById('modeTxt');
-    const statusTxt = document.getElementById('statusTxt');
-    const liquidTint = document.getElementById('liquidTint');
+          <!-- face details -->
+          <g class="face">
+            <circle cx="135" cy="110" r="7"></circle>
+            <circle cx="185" cy="110" r="7"></circle>
+            <path d="M160 125
+                     c 0 0 -10 0 -10 8
+                     c 0 10 20 10 20 0
+                     c 0 -8 -10 -8 -10 -8z"></path>
+            <path class="smile" d="M150 140 C156 146, 164 146, 170 140"></path>
+            <circle class="blush" cx="120" cy="130" r="10"></circle>
+            <circle class="blush" cx="200" cy="130" r="10"></circle>
+          </g>
 
-    const soundBtn = document.getElementById('soundBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const breakHalf = document.getElementById('breakHalf');
-    const focusHalf = document.getElementById('focusHalf');
+          <!-- collar -->
+          <g class="collar">
+            <path d="M95 175
+                     C120 200, 200 200, 225 175
+                     L225 190
+                     C200 220, 120 220, 95 190 Z"></path>
 
-    const ding = document.getElementById('ding');
+            <circle class="tagRing" cx="160" cy="218" r="6"></circle>
 
-    let soundEnabled = false;
+            <!-- tag circle -->
+            <circle class="tag" cx="160" cy="242" r="26"></circle>
 
-    let mode = 'focus';
-    let totalSeconds = 25 * 60;
-    let remainingSeconds = totalSeconds;
+            <!-- YOUR LOGO on the tag (logo.png), clipped to circle -->
+            <g clip-path="url(#tagClip)">
+              <!-- tweak x/y/width/height if you want the logo smaller/larger -->
+              <image href="logo.png" x="138" y="220" width="44" height="44" preserveAspectRatio="xMidYMid meet"></image>
+            </g>
+          </g>
 
-    let running = false;
-    let startedAt = null;
-    let remainingAtStart = null;
-    let rafId = null;
+          <!-- outline -->
+          <g class="outline">
+            <circle cx="160" cy="110" r="70"></circle>
+            <circle cx="105" cy="70" r="30"></circle>
+            <circle cx="215" cy="70" r="30"></circle>
+            <ellipse cx="160" cy="235" rx="95" ry="110"></ellipse>
+            <ellipse cx="105" cy="315" rx="45" ry="30"></ellipse>
+            <ellipse cx="215" cy="315" rx="45" ry="30"></ellipse>
+          </g>
+        </g>
+      </svg>
+    </section>
 
-    function fmt(sec){
-      const m = Math.floor(sec / 60);
-      const s = Math.floor(sec % 60);
-      return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-    }
+    <section class="readout" aria-label="Timer">
+      <div class="time" id="time">25:00</div>
+      <div class="label" id="label">Focus</div>
+    </section>
 
-    function applyModeLabel(){
-      modeTxt.textContent = (mode === 'focus') ? 'Focus' : 'Break';
-      // different tint colour by mode
-      liquidTint.style.background = (mode === 'focus')
-        ? 'rgba(138,168,155,0.0)'
-        : 'rgba(207,225,216,0.0)';
-    }
+    <section class="controls" aria-label="Controls">
+      <button class="btn primary" id="startPause">Start</button>
+      <button class="btn" id="reset">Reset</button>
 
-    function setMode(newMode){
-      mode = newMode;
-      totalSeconds = (mode === 'focus') ? 25*60 : 5*60;
-      remainingSeconds = totalSeconds;
-      stop();
-      applyModeLabel();
-      updateUI(0);
-      statusTxt.textContent = 'Ready…';
-    }
+      <div class="segmented" role="tablist" aria-label="Mode">
+        <button class="segBtn active" id="focusBtn" role="tab" aria-selected="true">Focus (25)</button>
+        <button class="segBtn" id="breakBtn" role="tab" aria-selected="false">Break (5)</button>
+      </div>
+    </section>
 
-    function updateUI(progress){
-      timeTxt.textContent = fmt(remainingSeconds);
+    <footer class="footer">
+      <span id="status">Ready</span>
+      <span>© Psych Diaries</span>
+    </footer>
+  </main>
 
-      // Progress tint: 0 -> 0.28 opacity (subtle)
-      const max = 0.28;
-      const op = Math.max(0, Math.min(max, progress * max));
-      if(mode === 'focus'){
-        liquidTint.style.background = `rgba(138,168,155,${op.toFixed(3)})`;
-      } else {
-        liquidTint.style.background = `rgba(207,225,216,${op.toFixed(3)})`;
-      }
-    }
+  <!-- Ding sound file -->
+  <audio id="ding" src="ding.mp3" preload="auto"></audio>
 
-    function tick(){
-      if(!running) return;
-
-      const now = Date.now();
-      const elapsed = Math.floor((now - startedAt) / 1000);
-      remainingSeconds = Math.max(0, remainingAtStart - elapsed);
-
-      const progress = 1 - (remainingSeconds / totalSeconds);
-      updateUI(progress);
-
-      if(remainingSeconds <= 0){
-        stop();
-        statusTxt.textContent = 'Done!';
-        if(soundEnabled){
-          ding.currentTime = 0;
-          ding.play().catch(()=>{});
-        }
-        return;
-      }
-      rafId = requestAnimationFrame(tick);
-    }
-
-    function start(){
-      if(running) return;
-      running = true;
-      startedAt = Date.now();
-      remainingAtStart = remainingSeconds;
-      statusTxt.textContent = 'Running…';
-      rafId = requestAnimationFrame(tick);
-    }
-
-    function stop(){
-      running = false;
-      if(rafId) cancelAnimationFrame(rafId);
-      rafId = null;
-      startedAt = null;
-      remainingAtStart = null;
-    }
-
-    function pause(){
-      if(!running) return;
-      stop();
-      statusTxt.textContent = 'Paused.';
-    }
-
-    function reset(){
-      stop();
-      remainingSeconds = totalSeconds;
-      updateUI(0);
-      statusTxt.textContent = 'Reset.';
-    }
-
-    // IMPORTANT: autoplay is blocked until a user gesture; this “arms” it
-    soundBtn.addEventListener('click', async () => {
-      try{
-        await ding.play();
-        ding.pause();
-        ding.currentTime = 0;
-        soundEnabled = true;
-        statusTxt.textContent = 'Sound enabled.';
-      }catch(e){
-        statusTxt.textContent = 'Click again to enable sound.';
-      }
-    });
-
-    // In your mockup, the left green button is “Pause”,
-    // but most users also expect Start. We do this:
-    // - first click starts
-    // - while running, click pauses
-    // That matches the UI without adding a separate Start button.
-    pauseBtn.addEventListener('click', () => {
-      if(running) pause();
-      else start();
-    });
-
-    resetBtn.addEventListener('click', reset);
-
-    breakHalf.addEventListener('click', () => setMode('break'));
-    focusHalf.addEventListener('click', () => setMode('focus'));
-
-    // init
-    applyModeLabel();
-    updateUI(0);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
