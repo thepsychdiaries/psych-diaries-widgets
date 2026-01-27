@@ -3,119 +3,160 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Psych Diaries · One Day At A Time</title>
+<title>Psych Diaries · One day at a time</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@800&display=swap" rel="stylesheet">
 
 <style>
-  * { box-sizing: border-box; }
-  html, body {
-    height: 100%;
-    margin: 0;
-    background: #f4f4f6;
-    display: grid;
-    place-items: center;
+  *{box-sizing:border-box;}
+  html,body{
+    height:100%;
+    margin:0;
+    display:grid;
+    place-items:center;
+    background:#f4f4f6;
   }
 
-  /* ===== STAMP WRAPPER ===== */
-  .stamp {
-    width: 220px;              /* tiny widget */
+  /* Make it WAY smaller */
+  .stamp{
+    width: 240px;           /* tweak: 200–260 */
     aspect-ratio: 1 / 1;
-    filter: drop-shadow(0 12px 28px rgba(0,0,0,.25));
+    position: relative;
+    box-shadow: 0 14px 34px rgba(0,0,0,.22);
   }
 
-  .mask {
-    width: 100%;
-    height: 100%;
+  /* This is the actual masked surface */
+  .surface{
+    width:100%;
+    height:100%;
+    position: relative;
+    overflow: hidden;
+
+    /* Apply SVG mask (real stamp edge) */
+    -webkit-mask-image: url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\
+<path fill="white" d="\
+M10,6 \
+H90 \
+c1.8,0 3.3,1.5 3.3,3.3 \
+c0,1.1-.6,2.1-1.5,2.7 \
+c-2.6,1.6-2.6,5.4,0,7 \
+c.9.6,1.5,1.6,1.5,2.7 \
+V76.3 \
+c0,1.1-.6,2.1-1.5,2.7 \
+c-2.6,1.6-2.6,5.4,0,7 \
+c.9.6,1.5,1.6,1.5,2.7 \
+c0,1.8-1.5,3.3-3.3,3.3 \
+H10 \
+c-1.8,0-3.3-1.5-3.3-3.3 \
+c0-1.1.6-2.1 1.5-2.7 \
+c2.6-1.6 2.6-5.4 0-7 \
+c-.9-.6-1.5-1.6-1.5-2.7 \
+V23.7 \
+c0-1.1.6-2.1 1.5-2.7 \
+c2.6-1.6 2.6-5.4 0-7 \
+c-.9-.6-1.5-1.6-1.5-2.7 \
+C6.7,7.5 8.2,6 10,6 Z\
+"/>\
+</svg>');
+    mask-image: url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\
+<path fill="white" d="\
+M10,6 \
+H90 \
+c1.8,0 3.3,1.5 3.3,3.3 \
+c0,1.1-.6,2.1-1.5,2.7 \
+c-2.6,1.6-2.6,5.4,0,7 \
+c.9.6,1.5,1.6,1.5,2.7 \
+V76.3 \
+c0,1.1-.6,2.1-1.5,2.7 \
+c-2.6,1.6-2.6,5.4,0,7 \
+c.9.6,1.5,1.6,1.5,2.7 \
+c0,1.8-1.5,3.3-3.3,3.3 \
+H10 \
+c-1.8,0-3.3-1.5-3.3-3.3 \
+c0-1.1.6-2.1 1.5-2.7 \
+c2.6-1.6 2.6-5.4 0-7 \
+c-.9-.6-1.5-1.6-1.5-2.7 \
+V23.7 \
+c0-1.1.6-2.1 1.5-2.7 \
+c2.6-1.6 2.6-5.4 0-7 \
+c-.9-.6-1.5-1.6-1.5-2.7 \
+C6.7,7.5 8.2,6 10,6 Z\
+"/>\
+</svg>');
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
   }
 
-  /* ===== CONTENT ===== */
-  .content {
-    position: absolute;
-    inset: 0;
-    padding: 14px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: center;
-    color: #111;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  video {
-    width: 100%;
-    height: 100%;
+  /* Video full opacity, no overlay */
+  .surface video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
     object-fit: cover;
     object-position: center 45%;
+    opacity: 1;
+    pointer-events:none;
   }
 
-  .headline {
-    font-family: "Playfair Display", serif;
-    font-size: 14px;
-    font-weight: 600;
-    margin: 2px 0 8px;
-    text-shadow: 0 1px 4px rgba(255,255,255,.6);
+  /* Text overlay */
+  .content{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding: 18px 14px;
+    text-align:center;
+    color:#111;
   }
 
-  .date {
-    font-family: "Poppins", sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: .5px;
+  .headline{
+    font-family:"Playfair Display", serif;
+    font-weight:600;
+    font-size: 18px;
+    margin: 0 0 10px;
+    text-shadow: 0 2px 8px rgba(255,255,255,.55);
+  }
+
+  .date{
+    font-family:"Poppins", sans-serif;
+    font-weight:800;
+    font-size: 38px;
+    letter-spacing: .6px;
     line-height: 1;
-    text-shadow: 0 1px 4px rgba(255,255,255,.7);
+    text-shadow: 0 2px 10px rgba(255,255,255,.6);
   }
 </style>
 </head>
 
 <body>
+  <div class="stamp">
+    <div class="surface">
+      <video autoplay muted loop playsinline>
+        <source src="catvid.mp4" type="video/mp4">
+      </video>
 
-<div class="stamp">
-  <!-- SVG stamp mask -->
-  <svg viewBox="0 0 100 100" class="mask">
-    <defs>
-      <clipPath id="stampMask" clipPathUnits="objectBoundingBox">
-        <!-- scalloped rectangle path -->
-        <path d="
-          M0.05,0.05
-          Q0.1,0 0.15,0.05
-          H0.85
-          Q0.9,0 0.95,0.05
-          V0.85
-          Q1,0.9 0.95,0.95
-          H0.15
-          Q0.1,1 0.05,0.95
-          V0.15
-          Q0,0.1 0.05,0.05
-          Z
-        "/>
-      </clipPath>
-    </defs>
-
-    <foreignObject width="100%" height="100%" clip-path="url(#stampMask)">
-      <div style="width:100%; height:100%; position:relative;">
-        <video autoplay muted loop playsinline>
-          <source src="catvid.mp4" type="video/mp4">
-        </video>
-
-        <div class="content">
-          <div class="headline">One day at a time.</div>
-          <div class="date" id="dateText">--/--/--</div>
-        </div>
+      <div class="content">
+        <div class="headline">One day at a time.</div>
+        <div class="date" id="dateText">--/--/--</div>
       </div>
-    </foreignObject>
-  </svg>
-</div>
+    </div>
+  </div>
 
 <script>
   const d = new Date();
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = String(d.getFullYear()).slice(-2);
-  document.getElementById("dateText").textContent = `${day}/${month}/${year}`;
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const yy = String(d.getFullYear()).slice(-2);
+  document.getElementById("dateText").textContent = `${dd}/${mm}/${yy}`;
 </script>
-
 </body>
 </html>
