@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Psych Diaries · Today</title>
+<title>Psych Diaries · One Day At A Time</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
 
@@ -17,39 +17,22 @@
     place-items: center;
   }
 
-  /* ===== STAMP WIDGET ===== */
+  /* ===== STAMP WRAPPER ===== */
   .stamp {
-    position: relative;
-    width: 220px;              /* <<< VERY SMALL */
+    width: 220px;              /* tiny widget */
     aspect-ratio: 1 / 1;
-    overflow: hidden;
-
-    /* REAL scalloped edges */
-    mask:
-      radial-gradient(circle, black 60%, transparent 62%) 0 0 / 22px 22px repeat;
-    -webkit-mask:
-      radial-gradient(circle, black 60%, transparent 62%) 0 0 / 22px 22px repeat;
-
-    box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    filter: drop-shadow(0 12px 28px rgba(0,0,0,.25));
   }
 
-  /* ===== VIDEO ===== */
-  .stamp video {
-    position: absolute;
-    inset: 0;
+  .mask {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center 45%;
-    opacity: 1;
-    pointer-events: none;
   }
 
   /* ===== CONTENT ===== */
   .content {
-    position: relative;
-    z-index: 2;
-    height: 100%;
+    position: absolute;
+    inset: 0;
     padding: 14px 12px;
     display: flex;
     flex-direction: column;
@@ -57,46 +40,73 @@
     justify-content: flex-start;
     text-align: center;
     color: #111;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
   }
 
   .headline {
     font-family: "Playfair Display", serif;
-    font-size: 14px;          /* <<< tiny + elegant */
+    font-size: 14px;
     font-weight: 600;
     margin: 2px 0 8px;
+    text-shadow: 0 1px 4px rgba(255,255,255,.6);
   }
 
   .date {
     font-family: "Poppins", sans-serif;
-    font-size: 28px;          /* <<< compact but bold */
+    font-size: 28px;
     font-weight: 800;
     letter-spacing: .5px;
     line-height: 1;
-  }
-
-  .headline, .date {
-    text-shadow:
-      0 1px 4px rgba(255,255,255,.6),
-      0 1px 0 rgba(255,255,255,.85);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    video { display: none; }
+    text-shadow: 0 1px 4px rgba(255,255,255,.7);
   }
 </style>
 </head>
 
 <body>
 
-<div class="stamp" role="application" aria-label="Cat date widget">
-  <video autoplay muted loop playsinline>
-    <source src="catvid.mp4" type="video/mp4">
-  </video>
+<div class="stamp">
+  <!-- SVG stamp mask -->
+  <svg viewBox="0 0 100 100" class="mask">
+    <defs>
+      <clipPath id="stampMask" clipPathUnits="objectBoundingBox">
+        <!-- scalloped rectangle path -->
+        <path d="
+          M0.05,0.05
+          Q0.1,0 0.15,0.05
+          H0.85
+          Q0.9,0 0.95,0.05
+          V0.85
+          Q1,0.9 0.95,0.95
+          H0.15
+          Q0.1,1 0.05,0.95
+          V0.15
+          Q0,0.1 0.05,0.05
+          Z
+        "/>
+      </clipPath>
+    </defs>
 
-  <div class="content">
-    <div class="headline">One day at a time.</div>
-    <div class="date" id="dateText">--/--/--</div>
-  </div>
+    <foreignObject width="100%" height="100%" clip-path="url(#stampMask)">
+      <div style="width:100%; height:100%; position:relative;">
+        <video autoplay muted loop playsinline>
+          <source src="catvid.mp4" type="video/mp4">
+        </video>
+
+        <div class="content">
+          <div class="headline">One day at a time.</div>
+          <div class="date" id="dateText">--/--/--</div>
+        </div>
+      </div>
+    </foreignObject>
+  </svg>
 </div>
 
 <script>
