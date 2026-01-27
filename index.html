@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Psych Diaries · Today</title>
+<title>Psych Diaries · Pawfect Day</title>
 
+<!-- Prettier fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -17,30 +18,35 @@
     place-items: center;
   }
 
-  /* ===== STAMP WIDGET ===== */
-  .stamp {
+  /* ===== SMALL SCALLOPED WIDGET ===== */
+  .poster {
     position: relative;
-    width: 220px;              /* <<< VERY SMALL */
+    width: min(320px, 90vw);   /* <<< MUCH smaller */
     aspect-ratio: 1 / 1;
     overflow: hidden;
 
-    /* REAL scalloped edges */
-    mask:
-      radial-gradient(circle, black 60%, transparent 62%) 0 0 / 22px 22px repeat;
-    -webkit-mask:
-      radial-gradient(circle, black 60%, transparent 62%) 0 0 / 22px 22px repeat;
+    --r: 14px;
 
-    box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    mask:
+      radial-gradient(circle at top left, transparent var(--r), black 0),
+      radial-gradient(circle at top right, transparent var(--r), black 0),
+      radial-gradient(circle at bottom left, transparent var(--r), black 0),
+      radial-gradient(circle at bottom right, transparent var(--r), black 0);
+    mask-size: 50% 50%;
+    mask-position: top left, top right, bottom left, bottom right;
+    mask-repeat: no-repeat;
+
+    box-shadow: 0 16px 40px rgba(0,0,0,.22);
   }
 
-  /* ===== VIDEO ===== */
-  .stamp video {
+  /* ===== VIDEO BACKGROUND ===== */
+  .poster video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 45%;
+    object-position: center 42%; /* cat slightly up */
     opacity: 1;
     pointer-events: none;
   }
@@ -50,7 +56,7 @@
     position: relative;
     z-index: 2;
     height: 100%;
-    padding: 14px 12px;
+    padding: 26px 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -61,14 +67,14 @@
 
   .headline {
     font-family: "Playfair Display", serif;
-    font-size: 14px;          /* <<< tiny + elegant */
+    font-size: 22px;          /* <<< smaller */
     font-weight: 600;
-    margin: 2px 0 8px;
+    margin: 0 0 18px;
   }
 
   .date {
     font-family: "Poppins", sans-serif;
-    font-size: 28px;          /* <<< compact but bold */
+    font-size: 44px;          /* <<< scaled down */
     font-weight: 800;
     letter-spacing: .5px;
     line-height: 1;
@@ -76,8 +82,8 @@
 
   .headline, .date {
     text-shadow:
-      0 1px 4px rgba(255,255,255,.6),
-      0 1px 0 rgba(255,255,255,.85);
+      0 2px 6px rgba(255,255,255,.65),
+      0 1px 0 rgba(255,255,255,.9);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -88,13 +94,13 @@
 
 <body>
 
-<div class="stamp" role="application" aria-label="Cat date widget">
+<div class="poster" role="application" aria-label="Cat calendar widget">
   <video autoplay muted loop playsinline>
     <source src="catvid.mp4" type="video/mp4">
   </video>
 
   <div class="content">
-    <div class="headline">One day at a time.</div>
+    <div class="headline">Have A Pawfect Day!</div>
     <div class="date" id="dateText">--/--/--</div>
   </div>
 </div>
