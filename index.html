@@ -3,63 +3,59 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Psych Diaries · Cat Calendar</title>
+<title>Psych Diaries · Pawfect Day</title>
 
 <style>
   :root{
-    --ink:#3a2f2a;
-    --beige:#f4e6dc;
-    --glass:rgba(255,255,255,.55);
+    --ink:#111;
+    --shadow: 0 20px 60px rgba(0,0,0,.20);
   }
 
-  *{box-sizing:border-box;}
-  html,body{
-    height:100%;
-    margin:0;
-    font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    background:#000;
-  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
 
   body{
     display:grid;
     place-items:center;
+    background:#f4f4f6;
   }
 
-  .card{
+  /* Square poster widget */
+  .poster{
     position:relative;
-    width:min(520px,92vw);
-    aspect-ratio: 16 / 10;
-    border-radius:28px;
+    width:min(520px, 92vw);
+    aspect-ratio: 1 / 1;              /* square like your mock */
+    border-radius: 0px;               /* keep it flat like the pic */
     overflow:hidden;
-    box-shadow:0 20px 60px rgba(0,0,0,.25);
-    background:var(--beige);
+    box-shadow: var(--shadow);
+    background:#d7a293;               /* fallback */
   }
 
-  /* 🎥 BACKGROUND VIDEO */
-  .card video{
+  /* Cat video background */
+  .poster video{
     position:absolute;
     inset:0;
     width:100%;
     height:100%;
     object-fit:cover;
-    object-position:center 35%; /* shifts cat UP */
-    opacity:.5;
-    filter:saturate(1.1) contrast(1.05);
+    object-position:center 35%;       /* shift cat up/down */
+    opacity: .55;                     /* visible but not screaming */
+    filter: saturate(1.05) contrast(1.05);
     pointer-events:none;
   }
 
-  /* 🌸 SOFT OVERLAY */
-  .overlay{
+  /* Warm pink overlay tint (so it matches your example) */
+  .tint{
     position:absolute;
     inset:0;
-    background:linear-gradient(
+    background: linear-gradient(
       to bottom,
-      rgba(244,230,220,.92),
-      rgba(244,230,220,.75)
+      rgba(214,153,140,.88),
+      rgba(201,127,112,.88)
     );
   }
 
-  /* 📅 CONTENT */
+  /* Content on top */
   .content{
     position:relative;
     z-index:2;
@@ -67,97 +63,60 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:center;
+    justify-content:flex-start;
+    padding: 64px 28px 28px;
     text-align:center;
-    color:var(--ink);
-    padding:24px;
+    color: var(--ink);
   }
 
-  .title{
-    position:absolute;
-    top:22px;
-    left:26px;
-    font-weight:650;
-    font-size:18px;
-    opacity:.9;
+  .headline{
+    font-size: 42px;        /* big but friendly */
+    font-weight: 500;       /* matches the “simple poster” vibe */
+    letter-spacing: .2px;
+    margin: 0 0 36px;
   }
 
-  .day-pill{
-    font-size:18px;
-    font-weight:600;
-    padding:10px 22px;
-    border-radius:999px;
-    background:var(--glass);
-    backdrop-filter:blur(6px);
-    margin-bottom:14px;
+  .date{
+    font-size: 80px;        /* BIG date */
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin: 0;
+    line-height: 1;
   }
 
-  .day-number{
-    font-size:88px;
-    font-weight:800;
-    line-height:1;
-    margin:4px 0 14px;
-    text-shadow:0 2px 0 rgba(255,255,255,.6);
+  /* Optional subtle shadow so black stays readable */
+  .headline, .date{
+    text-shadow: 0 1px 0 rgba(255,255,255,.15);
   }
 
-  .date-line{
-    font-size:18px;
-    font-weight:600;
-    padding:10px 22px;
-    border-radius:999px;
-    background:var(--glass);
-    backdrop-filter:blur(6px);
-    opacity:.85;
-  }
-
-  .footer{
-    position:absolute;
-    bottom:18px;
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    padding:0 26px;
-    font-size:13px;
-    opacity:.6;
+  /* If video doesn’t autoplay (Notion sometimes), this keeps it still */
+  @media (prefers-reduced-motion: reduce){
+    .poster video{ display:none; }
   }
 </style>
 </head>
 
 <body>
-  <div class="card">
-    <!-- 🎥 Cat background -->
-    <video autoplay muted loop playsinline>
+  <div class="poster" role="application" aria-label="Date widget">
+    <video autoplay muted loop playsinline aria-hidden="true">
       <source src="catvid.mp4" type="video/mp4">
     </video>
 
-    <div class="overlay"></div>
+    <div class="tint"></div>
 
-    <!-- 📅 Calendar content -->
     <div class="content">
-      <div class="title">Psych Diaries · Cat Calendar</div>
-
-      <div class="day-pill" id="weekday">Tuesday</div>
-      <div class="day-number" id="day">27</div>
-      <div class="date-line" id="fullDate">January 2026</div>
-
-      <div class="footer">
-        <div>Local date</div>
-        <div>© Psych Diaries</div>
-      </div>
+      <h1 class="headline">Have A Pawfect Day!</h1>
+      <div class="date" id="dateText">--/--/--</div>
     </div>
   </div>
 
 <script>
+  // Format: DD/MM/YY (like your screenshot)
   const now = new Date();
-
-  document.getElementById("weekday").textContent =
-    now.toLocaleDateString(undefined,{ weekday:"long" });
-
-  document.getElementById("day").textContent =
-    now.getDate();
-
-  document.getElementById("fullDate").textContent =
-    now.toLocaleDateString(undefined,{ month:"long", year:"numeric" });
+  const dd = String(now.getDate()).padStart(2, "0");
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const yy = String(now.getFullYear()).slice(-2);
+  document.getElementById("dateText").textContent = `${dd}/${mm}/${yy}`;
 </script>
 </body>
 </html>
