@@ -3,233 +3,108 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Psych Diaries · One day at a time</title>
+<title>Psych Diaries · Today</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
-  *{box-sizing:border-box;}
-  html,body{
-    height:100%;
-    margin:0;
-    display:grid;
-    place-items:center;
-    background:#f4f4f6;
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: #f4f4f6;
+    display: grid;
+    place-items: center;
   }
 
-  .stamp{
-    width: 240px;        /* small widget */
+  /* ===== STAMP WIDGET ===== */
+  .stamp {
+    position: relative;
+    width: 220px;              /* <<< VERY SMALL */
     aspect-ratio: 1 / 1;
-    filter: drop-shadow(0 14px 34px rgba(0,0,0,.22));
+    overflow: hidden;
+
+    /* REAL scalloped edges */
+    mask:
+      radial-gradient(circle, black 60%, transparent 62%) 0 0 / 22px 22px repeat;
+    -webkit-mask:
+      radial-gradient(circle, black 60%, transparent 62%) 0 0 / 22px 22px repeat;
+
+    box-shadow: 0 12px 30px rgba(0,0,0,.25);
   }
 
-  .layer{
-    width:100%;
-    height:100%;
-    position:relative;
+  /* ===== VIDEO ===== */
+  .stamp video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    opacity: 1;
+    pointer-events: none;
   }
 
-  .content{
-    position:absolute;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding: 18px 14px;
-    text-align:center;
-    color:#111;
-    pointer-events:none;
+  /* ===== CONTENT ===== */
+  .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    color: #111;
   }
 
-  .headline{
-    font-family:"Playfair Display", serif;
-    font-weight:600;
-    font-size: 18px;
-    margin: 0 0 10px;
-    text-shadow: 0 2px 8px rgba(255,255,255,.55);
+  .headline {
+    font-family: "Playfair Display", serif;
+    font-size: 14px;          /* <<< tiny + elegant */
+    font-weight: 600;
+    margin: 2px 0 8px;
   }
 
-  .date{
-    font-family:"Poppins", sans-serif;
-    font-weight:800;
-    font-size: 38px;
-    letter-spacing: .6px;
+  .date {
+    font-family: "Poppins", sans-serif;
+    font-size: 28px;          /* <<< compact but bold */
+    font-weight: 800;
+    letter-spacing: .5px;
     line-height: 1;
-    text-shadow: 0 2px 10px rgba(255,255,255,.6);
+  }
+
+  .headline, .date {
+    text-shadow:
+      0 1px 4px rgba(255,255,255,.6),
+      0 1px 0 rgba(255,255,255,.85);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    video { display: none; }
   }
 </style>
 </head>
 
 <body>
 
-<!-- SVG does the stamp-cutout, HTML does the content -->
-<svg class="stamp" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Cat date stamp">
-  <defs>
-    <!-- A “postage stamp” scalloped outline -->
-    <clipPath id="stampClip">
-      <!-- base rounded rect -->
-      <path d="
-        M8 8
-        H92
-        V92
-        H8
-        Z
-      "/>
+<div class="stamp" role="application" aria-label="Cat date widget">
+  <video autoplay muted loop playsinline>
+    <source src="catvid.mp4" type="video/mp4">
+  </video>
 
-      <!-- Punch scallops by overlaying circles in the clip path:
-           Trick: clipPath keeps what's inside shapes, so we build the stamp as ONE path instead:
-           Use an SVG path for a scalloped rectangle (precomputed-ish look). -->
-    </clipPath>
-
-    <!-- REAL scalloped rectangle path -->
-    <clipPath id="scallopClip">
-      <path d="
-        M10,8
-        H90
-        Q92,8 92,10
-        V14
-        Q92,16 90,16
-        Q88,16 88,14
-        Q88,12 90,12
-        Q92,12 92,14
-
-        V22
-        Q92,24 90,24
-        Q88,24 88,22
-        Q88,20 90,20
-        Q92,20 92,22
-
-        V30
-        Q92,32 90,32
-        Q88,32 88,30
-        Q88,28 90,28
-        Q92,28 92,30
-
-        V38
-        Q92,40 90,40
-        Q88,40 88,38
-        Q88,36 90,36
-        Q92,36 92,38
-
-        V46
-        Q92,48 90,48
-        Q88,48 88,46
-        Q88,44 90,44
-        Q92,44 92,46
-
-        V54
-        Q92,56 90,56
-        Q88,56 88,54
-        Q88,52 90,52
-        Q92,52 92,54
-
-        V62
-        Q92,64 90,64
-        Q88,64 88,62
-        Q88,60 90,60
-        Q92,60 92,62
-
-        V70
-        Q92,72 90,72
-        Q88,72 88,70
-        Q88,68 90,68
-        Q92,68 92,70
-
-        V78
-        Q92,80 90,80
-        Q88,80 88,78
-        Q88,76 90,76
-        Q92,76 92,78
-
-        V90
-        Q92,92 90,92
-        H10
-        Q8,92 8,90
-
-        V78
-        Q8,76 10,76
-        Q12,76 12,78
-        Q12,80 10,80
-        Q8,80 8,78
-
-        V70
-        Q8,68 10,68
-        Q12,68 12,70
-        Q12,72 10,72
-        Q8,72 8,70
-
-        V62
-        Q8,60 10,60
-        Q12,60 12,62
-        Q12,64 10,64
-        Q8,64 8,62
-
-        V54
-        Q8,52 10,52
-        Q12,52 12,54
-        Q12,56 10,56
-        Q8,56 8,54
-
-        V46
-        Q8,44 10,44
-        Q12,44 12,46
-        Q12,48 10,48
-        Q8,48 8,46
-
-        V38
-        Q8,36 10,36
-        Q12,36 12,38
-        Q12,40 10,40
-        Q8,40 8,38
-
-        V30
-        Q8,28 10,28
-        Q12,28 12,30
-        Q12,32 10,32
-        Q8,32 8,30
-
-        V22
-        Q8,20 10,20
-        Q12,20 12,22
-        Q12,24 10,24
-        Q8,24 8,22
-
-        V14
-        Q8,12 10,12
-        Q12,12 12,14
-        Q12,16 10,16
-        Q8,16 8,14
-
-        V10
-        Q8,8 10,8
-        Z
-      "/>
-    </clipPath>
-  </defs>
-
-  <!-- The HTML content (video + text) clipped by the scalloped shape -->
-  <foreignObject x="0" y="0" width="100" height="100" clip-path="url(#scallopClip)">
-    <div xmlns="http://www.w3.org/1999/xhtml" class="layer">
-      <video autoplay muted loop playsinline
-        style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 45%;">
-        <source src="catvid.mp4" type="video/mp4" />
-      </video>
-
-      <div class="content">
-        <div class="headline">One day at a time.</div>
-        <div class="date" id="dateText">--/--/--</div>
-      </div>
-    </div>
-  </foreignObject>
-</svg>
+  <div class="content">
+    <div class="headline">One day at a time.</div>
+    <div class="date" id="dateText">--/--/--</div>
+  </div>
+</div>
 
 <script>
   const d = new Date();
-  const dd = String(d.getDate()).padStart(2,"0");
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const yy = String(d.getFullYear()).slice(-2);
-  document.getElementById("dateText").textContent = `${dd}/${mm}/${yy}`;
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = String(d.getFullYear()).slice(-2);
+  document.getElementById("dateText").textContent = `${day}/${month}/${year}`;
 </script>
 
 </body>
