@@ -6,117 +6,116 @@
 <title>Psych Diaries · Pawfect Day</title>
 
 <style>
-  :root{
-    --ink:#111;
-    --shadow: 0 20px 60px rgba(0,0,0,.20);
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    background: #f4f4f6;
+    display: grid;
+    place-items: center;
   }
 
-  *{ box-sizing:border-box; }
-  html,body{ height:100%; margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
+  /* ===== SCALLOPED CARD ===== */
+  .poster {
+    position: relative;
+    width: min(520px, 92vw);
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
 
-  body{
-    display:grid;
-    place-items:center;
-    background:#f4f4f6;
+    /* scalloped edge trick */
+    --r: 18px;
+    background:
+      radial-gradient(circle at top left, transparent var(--r), white 0) top left,
+      radial-gradient(circle at top right, transparent var(--r), white 0) top right,
+      radial-gradient(circle at bottom left, transparent var(--r), white 0) bottom left,
+      radial-gradient(circle at bottom right, transparent var(--r), white 0) bottom right;
+    background-size: 50% 50%;
+    background-repeat: no-repeat;
+
+    mask:
+      radial-gradient(circle at top left, transparent var(--r), black 0) top left,
+      radial-gradient(circle at top right, transparent var(--r), black 0) top right,
+      radial-gradient(circle at bottom left, transparent var(--r), black 0) bottom left,
+      radial-gradient(circle at bottom right, transparent var(--r), black 0) bottom right;
+    mask-size: 50% 50%;
+    mask-repeat: no-repeat;
+
+    box-shadow: 0 24px 70px rgba(0,0,0,.25);
   }
 
-  /* Square poster widget */
-  .poster{
-    position:relative;
-    width:min(520px, 92vw);
-    aspect-ratio: 1 / 1;              /* square like your mock */
-    border-radius: 0px;               /* keep it flat like the pic */
-    overflow:hidden;
-    box-shadow: var(--shadow);
-    background:#d7a293;               /* fallback */
+  /* ===== VIDEO BACKGROUND ===== */
+  .poster video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%; /* lifts cat slightly */
+    opacity: 1;
+    pointer-events: none;
   }
 
-  /* Cat video background */
-  .poster video{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center 35%;       /* shift cat up/down */
-    opacity: .55;                     /* visible but not screaming */
-    filter: saturate(1.05) contrast(1.05);
-    pointer-events:none;
+  /* ===== CONTENT ===== */
+  .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    padding: 56px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    color: #111;
   }
 
-  /* Warm pink overlay tint (so it matches your example) */
-  .tint{
-    position:absolute;
-    inset:0;
-    background: linear-gradient(
-      to bottom,
-      rgba(214,153,140,.88),
-      rgba(201,127,112,.88)
-    );
-  }
-
-  /* Content on top */
-  .content{
-    position:relative;
-    z-index:2;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding: 64px 28px 28px;
-    text-align:center;
-    color: var(--ink);
-  }
-
-  .headline{
-    font-size: 42px;        /* big but friendly */
-    font-weight: 500;       /* matches the “simple poster” vibe */
-    letter-spacing: .2px;
+  .headline {
+    font-size: 42px;
+    font-weight: 500;
     margin: 0 0 36px;
   }
 
-  .date{
-    font-size: 80px;        /* BIG date */
+  .date {
+    font-size: 84px;
     font-weight: 900;
     letter-spacing: 1px;
-    margin: 0;
     line-height: 1;
   }
 
-  /* Optional subtle shadow so black stays readable */
-  .headline, .date{
-    text-shadow: 0 1px 0 rgba(255,255,255,.15);
+  /* Keep text readable over video */
+  .headline, .date {
+    text-shadow:
+      0 2px 6px rgba(255,255,255,.6),
+      0 1px 0 rgba(255,255,255,.8);
   }
 
-  /* If video doesn’t autoplay (Notion sometimes), this keeps it still */
-  @media (prefers-reduced-motion: reduce){
-    .poster video{ display:none; }
+  @media (prefers-reduced-motion: reduce) {
+    video { display: none; }
   }
 </style>
 </head>
 
 <body>
-  <div class="poster" role="application" aria-label="Date widget">
-    <video autoplay muted loop playsinline aria-hidden="true">
-      <source src="catvid.mp4" type="video/mp4">
-    </video>
 
-    <div class="tint"></div>
+<div class="poster" role="application" aria-label="Cat calendar widget">
+  <video autoplay muted loop playsinline>
+    <source src="catvid.mp4" type="video/mp4">
+  </video>
 
-    <div class="content">
-      <h1 class="headline">Have A Pawfect Day!</h1>
-      <div class="date" id="dateText">--/--/--</div>
-    </div>
+  <div class="content">
+    <div class="headline">Have A Pawfect Day!</div>
+    <div class="date" id="dateText">--/--/--</div>
   </div>
+</div>
 
 <script>
-  // Format: DD/MM/YY (like your screenshot)
-  const now = new Date();
-  const dd = String(now.getDate()).padStart(2, "0");
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const yy = String(now.getFullYear()).slice(-2);
-  document.getElementById("dateText").textContent = `${dd}/${mm}/${yy}`;
+  const d = new Date();
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = String(d.getFullYear()).slice(-2);
+  document.getElementById("dateText").textContent = `${day}/${month}/${year}`;
 </script>
+
 </body>
 </html>
