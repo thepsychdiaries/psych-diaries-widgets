@@ -5,15 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Psych Diaries · Pawfect Day</title>
 
-<!-- Fonts: handwritten for headline + date -->
+<!-- Handwritten font for headline + date -->
 <link href="https://fonts.googleapis.com/css2?family=Momo+Signature&display=swap" rel="stylesheet">
 
 <style>
   * { box-sizing: border-box; }
+
   html, body {
     height: 100%;
     margin: 0;
-    background: #ffffff;
+    background: #ffffff; /* Notion page white */
     display: grid;
     place-items: center;
   }
@@ -27,6 +28,13 @@
 
     --r: 10px;
 
+    /* IMPORTANT: match video background to hide mask seam lines */
+    background: #d39c8d;
+
+    /* Helps reduce GPU seam/blur artifacts in some browsers */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+
     mask:
       radial-gradient(circle at top left, transparent var(--r), black 0),
       radial-gradient(circle at top right, transparent var(--r), black 0),
@@ -36,7 +44,7 @@
     mask-position: top left, top right, bottom left, bottom right;
     mask-repeat: no-repeat;
 
-    box-shadow: 0 16px 40px rgba(0,0,0,.22);
+    box-shadow: 0 10px 24px rgba(0,0,0,.18);
   }
 
   /* ===== VIDEO BACKGROUND ===== */
@@ -46,9 +54,16 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 52%; /* higher % = cat moves DOWN */
+
+    /* higher % = cat moves DOWN */
+    object-position: center 52%;
+
     opacity: 1;
     pointer-events: none;
+
+    /* Helps some browsers keep layers crisp */
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   /* ===== CONTENT ===== */
@@ -60,9 +75,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* date + headline at top */
+    justify-content: flex-start; /* date stays at top */
     text-align: center;
     color: #111;
+
+    /* Reduce text blur during scaling/zoom in some browsers */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: geometricPrecision;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .headline {
@@ -76,18 +98,17 @@
   /* Handwritten dd.mm.yy */
   .date {
     font-family: "Momo Signature", cursive;
-    font-size: 30px;     /* smaller + diary-like */
+    font-size: 30px;
     font-weight: 400;
-    letter-spacing: 0;   /* keep script natural */
+    letter-spacing: 0;
     line-height: 1;
-    margin: 0 0 14px;    /* space before cat */
+    margin: 0 0 14px;
     transform: rotate(-1deg);
   }
 
+  /* Softer shadow = less “halo blur” when zoomed */
   .headline, .date {
-    text-shadow:
-      0 2px 6px rgba(255,255,255,.65),
-      0 1px 0 rgba(255,255,255,.9);
+    text-shadow: 0 1px 3px rgba(255,255,255,.6);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -112,10 +133,4 @@
 <script>
   const d = new Date();
   const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = String(d.getFullYear()).slice(-2);
-  document.getElementById("dateText").textContent = `${day}.${month}.${year}`;
-</script>
-
-</body>
-</html>
+  const m
