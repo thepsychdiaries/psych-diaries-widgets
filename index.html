@@ -11,8 +11,10 @@
   --terracotta:#9b4d3f;
   --beige:#fbf4ea;
   --shadow:0 14px 40px rgba(0,0,0,.16);
-  --fill-focus:rgba(155,77,63,.16);
-  --fill-break:rgba(179,95,82,.12);
+
+  /* Fill tints (kept for your existing JS) */
+  --fill-focus:rgba(155,77,63,.12);
+  --fill-break:rgba(179,95,82,.10);
 }
 
 *{box-sizing:border-box;}
@@ -31,7 +33,7 @@ body{
 .card{
   width:min(460px,92vw);
   border-radius:28px;
-  background:rgba(255,255,255,.86);
+  background:rgba(255,255,255,.82);
   border:1px solid rgba(155,77,63,.14);
   box-shadow:var(--shadow);
   padding:18px;
@@ -40,27 +42,47 @@ body{
   backdrop-filter:blur(10px);
 }
 
-/* ───────── Cat video INSIDE card ───────── */
+/* ───────── Cat video INSIDE card (higher opacity) ───────── */
 .card-video{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
-  opacity:.22;                 /* adjust to taste */
+
+  /* cat is now focal */
+  opacity:.32;                 /* sweet spot: .28–.36 */
+  filter: blur(.2px) saturate(1.05);
+
   pointer-events:none;
   z-index:0;
-}
-
-/* UI layers above video */
-.top,.content,.controls,.footer{
-  position:relative;
-  z-index:1;
 }
 
 /* Motion safety */
 @media (prefers-reduced-motion: reduce){
   .card-video{display:none;}
+}
+
+/* ───────── Progress wash (moved to card) ───────── */
+.fill{
+  position:absolute;
+  inset:auto 0 0 0;
+  height:0%;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0) 0%,
+    var(--fill-focus) 70%,
+    var(--fill-focus) 100%
+  );
+  transition: height .35s ease;
+  pointer-events:none;
+  z-index:0; /* behind UI, above video */
+}
+
+/* UI layers above video + fill */
+.top,.content,.controls,.footer{
+  position:relative;
+  z-index:1;
 }
 
 /* ───────── Top row ───────── */
@@ -86,50 +108,49 @@ body{
 }
 .pill input{accent-color:var(--terracotta);}
 
-/* ───────── Stage ───────── */
+/* ───────── Content / (white box removed) ───────── */
 .content{
   display:grid;
   place-items:center;
-  padding:12px 0;
+  padding:18px 0 10px;
 }
+
+/* Stage is now just a positioning wrapper */
 .stage{
-  width:min(340px,78vw);
-  aspect-ratio:1/1;
-  border-radius:32px;
-  background:rgba(255,255,255,.72);
-  border:1px solid rgba(155,77,63,.12);
-  box-shadow:0 10px 22px rgba(0,0,0,.08);
+  width:100%;
+  min-height:240px;
   display:grid;
   place-items:center;
   position:relative;
-  overflow:hidden;
+  margin-top:8px;
 }
 
-/* Progress fill */
-.fill{
-  position:absolute;
-  inset:auto 0 0 0;
-  height:0%;
-  background:linear-gradient(
-    180deg,
-    rgba(255,255,255,0),
-    var(--fill-focus)
-  );
-  transition:height .35s ease;
-}
-
-/* Timer text */
+/* Timer text - readable without a box */
 .time{
   font-size:64px;
   font-weight:720;
   letter-spacing:1px;
-  text-shadow:0 1px 0 rgba(255,255,255,.7);
+  color:var(--ink);
+  text-shadow:
+    0 2px 12px rgba(255,255,255,.9),
+    0 1px 0 rgba(255,255,255,.8);
 }
+
+/* Mode label (optional subtle pill) */
 .mode{
-  margin-top:6px;
+  margin-top:10px;
   font-size:14px;
-  opacity:.65;
+  opacity:.75;
   text-align:center;
+  letter-spacing:.3px;
+}
+.pill-mode{
+  padding:6px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.55);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(155,77,63,.12);
+  display:inline-block;
 }
 
 /* ───────── Controls ───────── */
@@ -138,20 +159,21 @@ body{
   gap:10px;
   justify-content:center;
   flex-wrap:wrap;
-  padding-top:14px;
+  padding-top:8px;
 }
 button{
   border:1px solid rgba(155,77,63,.18);
-  background:rgba(243,237,231,.9);
+  background:rgba(255,255,255,.78);
   color:var(--ink);
   padding:10px 14px;
   border-radius:999px;
   font-weight:650;
   cursor:pointer;
   min-width:108px;
+  backdrop-filter: blur(8px);
 }
 button.primary{
-  background:rgba(155,77,63,.12);
+  background:rgba(155,77,63,.14);
   border-color:rgba(155,77,63,.26);
   color:var(--terracotta);
 }
@@ -161,9 +183,9 @@ button.primary{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding-top:8px;
+  padding-top:10px;
   font-size:12px;
-  opacity:.6;
+  opacity:.65;
 }
 .dot{
   width:7px;height:7px;border-radius:50%;
@@ -182,20 +204,22 @@ button.primary{
     <source src="catvid.mp4" type="video/mp4">
   </video>
 
+  <!-- Progress wash layer (now on card, not inside a white box) -->
+  <div id="fill" class="fill"></div>
+
   <div class="top">
     <div class="brand">Psych Diaries • Pomodoro</div>
-    <label class="pill">
+    <label class="pill" title="Enable/disable sound">
       <input id="soundToggle" type="checkbox" checked>
       Sound on
     </label>
   </div>
 
   <div class="content">
-    <div class="stage">
-      <div id="fill" class="fill"></div>
+    <div class="stage" aria-label="Timer display">
       <div>
         <div id="time" class="time">25:00</div>
-        <div id="mode" class="mode">Focus</div>
+        <div id="mode" class="mode pill-mode">Focus</div>
       </div>
     </div>
   </div>
@@ -219,90 +243,134 @@ button.primary{
 </div>
 
 <script>
-const FOCUS_SECONDS=25*60;
-const BREAK_SECONDS=5*60;
+  // ------- Simple Pomodoro (25/5) with "fill up" progress -------
+  const FOCUS_SECONDS = 25 * 60;
+  const BREAK_SECONDS = 5 * 60;
 
-const elTime=document.getElementById("time");
-const elMode=document.getElementById("mode");
-const elStatus=document.getElementById("status");
-const elFill=document.getElementById("fill");
+  const elTime = document.getElementById("time");
+  const elMode = document.getElementById("mode");
+  const elStatus = document.getElementById("status");
+  const elFill = document.getElementById("fill");
 
-const btnStartPause=document.getElementById("startPause");
-const btnReset=document.getElementById("reset");
-const btnSetBreak=document.getElementById("setBreak");
-const btnSetFocus=document.getElementById("setFocus");
+  const btnStartPause = document.getElementById("startPause");
+  const btnReset = document.getElementById("reset");
+  const btnSetBreak = document.getElementById("setBreak");
+  const btnSetFocus = document.getElementById("setFocus");
 
-const ding=document.getElementById("ding");
-const soundToggle=document.getElementById("soundToggle");
+  const ding = document.getElementById("ding");
+  const soundToggle = document.getElementById("soundToggle");
 
-let mode="focus";
-let duration=FOCUS_SECONDS;
-let remaining=duration;
-let running=false;
-let timerId=null;
+  let mode = "focus"; // "focus" | "break"
+  let duration = FOCUS_SECONDS;
+  let remaining = duration;
+  let running = false;
+  let timerId = null;
 
-function fmt(sec){
-  const m=Math.floor(sec/60);
-  const s=sec%60;
-  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-}
+  function fmt(sec){
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  }
 
-function updateUI(){
-  elTime.textContent=fmt(remaining);
-  elFill.style.height=`${((duration-remaining)/duration)*100}%`;
-}
+  function setMode(nextMode){
+    mode = nextMode;
+    duration = (mode === "focus") ? FOCUS_SECONDS : BREAK_SECONDS;
+    remaining = duration;
+    running = false;
+    stopTimer();
 
-function setMode(next){
-  mode=next;
-  duration=mode==="focus"?FOCUS_SECONDS:BREAK_SECONDS;
-  remaining=duration;
-  running=false;
-  clearInterval(timerId);
-  timerId=null;
-  elMode.textContent=mode==="focus"?"Focus":"Break";
-  elStatus.textContent="Ready";
-  btnStartPause.textContent="Start";
-  updateUI();
-}
-
-function tick(){
-  if(!running)return;
-  remaining--;
-  if(remaining<=0){
-    remaining=0;
+    elMode.textContent = (mode === "focus") ? "Focus" : "Break";
+    elStatus.textContent = "Ready";
+    btnStartPause.textContent = "Start";
     updateUI();
-    if(soundToggle.checked){
-      ding.currentTime=0;
-      ding.play().catch(()=>{});
+
+    // Adjust fill tint for focus vs break (keeps your original behavior)
+    document.documentElement.style.setProperty(
+      "--fill-focus",
+      mode === "focus" ? "rgba(155, 77, 63, .12)" : "rgba(179, 95, 82, .10)"
+    );
+    elFill.style.background = mode === "focus"
+      ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(155, 77, 63, .12) 70%, rgba(155, 77, 63, .12) 100%)"
+      : "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(179, 95, 82, .10) 70%, rgba(179, 95, 82, .10) 100%)";
+  }
+
+  function updateUI(){
+    elTime.textContent = fmt(remaining);
+
+    const progress = (duration - remaining) / duration; // 0..1
+    const pct = Math.max(0, Math.min(100, progress * 100));
+    elFill.style.height = `${pct}%`;
+  }
+
+  function playDing(){
+    if (!soundToggle.checked) return;
+    ding.currentTime = 0;
+    ding.play().catch(() => {});
+  }
+
+  function tick(){
+    if (!running) return;
+    remaining -= 1;
+    if (remaining <= 0){
+      remaining = 0;
+      updateUI();
+      playDing();
+      running = false;
+      stopTimer();
+      btnStartPause.textContent = "Start";
+      elStatus.textContent = "Done!";
+      return;
     }
-    running=false;
-    clearInterval(timerId);
-    elStatus.textContent="Done!";
-    btnStartPause.textContent="Start";
-    return;
+    updateUI();
   }
-  updateUI();
-}
 
-btnStartPause.onclick=()=>{
-  if(!running){
-    running=true;
-    elStatus.textContent="Running…";
-    btnStartPause.textContent="Pause";
-    timerId=setInterval(tick,1000);
-  }else{
-    running=false;
-    clearInterval(timerId);
-    elStatus.textContent="Paused";
-    btnStartPause.textContent="Start";
+  function startTimer(){
+    if (running) return;
+    running = true;
+    elStatus.textContent = "Running…";
+    timerId = setInterval(tick, 1000);
   }
-};
 
-btnReset.onclick=()=>setMode(mode);
-btnSetBreak.onclick=()=>setMode("break");
-btnSetFocus.onclick=()=>setMode("focus");
+  function stopTimer(){
+    if (timerId){
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
 
-setMode("focus");
+  function reset(){
+    running = false;
+    stopTimer();
+    remaining = duration;
+    elStatus.textContent = "Ready";
+    btnStartPause.textContent = "Start";
+    updateUI();
+  }
+
+  // --- Button wiring ---
+  btnStartPause.addEventListener("click", () => {
+    // Ensure audio is "unlocked" after first click in some browsers:
+    if (soundToggle.checked) {
+      ding.play().then(() => { ding.pause(); ding.currentTime = 0; }).catch(()=>{});
+    }
+
+    if (!running){
+      startTimer();
+      btnStartPause.textContent = "Pause";
+    } else {
+      running = false;
+      stopTimer();
+      elStatus.textContent = "Paused";
+      btnStartPause.textContent = "Start";
+    }
+  });
+
+  btnReset.addEventListener("click", reset);
+  btnSetBreak.addEventListener("click", () => setMode("break"));
+  btnSetFocus.addEventListener("click", () => setMode("focus"));
+
+  // Initialize UI
+  setMode("focus");
 </script>
 
 </body>
