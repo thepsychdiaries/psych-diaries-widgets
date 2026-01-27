@@ -17,75 +17,16 @@
     background:#f4f4f6;
   }
 
-  /* Smaller widget */
   .stamp{
-    width: 240px;              /* tweak 200–280 */
+    width: 240px;        /* small widget */
     aspect-ratio: 1 / 1;
-    box-shadow: 0 14px 34px rgba(0,0,0,.22);
+    filter: drop-shadow(0 14px 34px rgba(0,0,0,.22));
   }
 
-  .surface{
+  .layer{
     width:100%;
     height:100%;
-    position: relative;
-    overflow:hidden;
-
-    /* Proper stamp perforation mask */
-    -webkit-mask-image: url('data:image/svg+xml;utf8,\
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\
-  <defs>\
-    <mask id="m">\
-      <rect width="100" height="100" fill="black"/>\
-      <rect x="6" y="6" width="88" height="88" rx="6" ry="6" fill="white"/>\
-      <!-- punch holes around edges -->\
-      <g fill="black">\
-        <!-- top row -->\
-        <circle cx="14" cy="6" r="3.2"/><circle cx="26" cy="6" r="3.2"/><circle cx="38" cy="6" r="3.2"/><circle cx="50" cy="6" r="3.2"/><circle cx="62" cy="6" r="3.2"/><circle cx="74" cy="6" r="3.2"/><circle cx="86" cy="6" r="3.2"/>\
-        <!-- bottom row -->\
-        <circle cx="14" cy="94" r="3.2"/><circle cx="26" cy="94" r="3.2"/><circle cx="38" cy="94" r="3.2"/><circle cx="50" cy="94" r="3.2"/><circle cx="62" cy="94" r="3.2"/><circle cx="74" cy="94" r="3.2"/><circle cx="86" cy="94" r="3.2"/>\
-        <!-- left column -->\
-        <circle cx="6" cy="14" r="3.2"/><circle cx="6" cy="26" r="3.2"/><circle cx="6" cy="38" r="3.2"/><circle cx="6" cy="50" r="3.2"/><circle cx="6" cy="62" r="3.2"/><circle cx="6" cy="74" r="3.2"/><circle cx="6" cy="86" r="3.2"/>\
-        <!-- right column -->\
-        <circle cx="94" cy="14" r="3.2"/><circle cx="94" cy="26" r="3.2"/><circle cx="94" cy="38" r="3.2"/><circle cx="94" cy="50" r="3.2"/><circle cx="94" cy="62" r="3.2"/><circle cx="94" cy="74" r="3.2"/><circle cx="94" cy="86" r="3.2"/>\
-      </g>\
-    </mask>\
-  </defs>\
-  <rect width="100" height="100" fill="white" mask="url(#m)"/>\
-</svg>');
-    mask-image: url('data:image/svg+xml;utf8,\
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\
-  <defs>\
-    <mask id="m">\
-      <rect width="100" height="100" fill="black"/>\
-      <rect x="6" y="6" width="88" height="88" rx="6" ry="6" fill="white"/>\
-      <g fill="black">\
-        <circle cx="14" cy="6" r="3.2"/><circle cx="26" cy="6" r="3.2"/><circle cx="38" cy="6" r="3.2"/><circle cx="50" cy="6" r="3.2"/><circle cx="62" cy="6" r="3.2"/><circle cx="74" cy="6" r="3.2"/><circle cx="86" cy="6" r="3.2"/>\
-        <circle cx="14" cy="94" r="3.2"/><circle cx="26" cy="94" r="3.2"/><circle cx="38" cy="94" r="3.2"/><circle cx="50" cy="94" r="3.2"/><circle cx="62" cy="94" r="3.2"/><circle cx="74" cy="94" r="3.2"/><circle cx="86" cy="94" r="3.2"/>\
-        <circle cx="6" cy="14" r="3.2"/><circle cx="6" cy="26" r="3.2"/><circle cx="6" cy="38" r="3.2"/><circle cx="6" cy="50" r="3.2"/><circle cx="6" cy="62" r="3.2"/><circle cx="6" cy="74" r="3.2"/><circle cx="6" cy="86" r="3.2"/>\
-        <circle cx="94" cy="14" r="3.2"/><circle cx="94" cy="26" r="3.2"/><circle cx="94" cy="38" r="3.2"/><circle cx="94" cy="50" r="3.2"/><circle cx="94" cy="62" r="3.2"/><circle cx="94" cy="74" r="3.2"/><circle cx="94" cy="86" r="3.2"/>\
-      </g>\
-    </mask>\
-  </defs>\
-  <rect width="100" height="100" fill="white" mask="url(#m)"/>\
-</svg>');
-
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-  }
-
-  .surface video{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit: cover;
-    object-position: center 45%;
-    opacity:1;
-    pointer-events:none;
+    position:relative;
   }
 
   .content{
@@ -98,6 +39,7 @@
     padding: 18px 14px;
     text-align:center;
     color:#111;
+    pointer-events:none;
   }
 
   .headline{
@@ -120,10 +62,158 @@
 </head>
 
 <body>
-  <div class="stamp">
-    <div class="surface">
-      <video autoplay muted loop playsinline>
-        <source src="catvid.mp4" type="video/mp4">
+
+<!-- SVG does the stamp-cutout, HTML does the content -->
+<svg class="stamp" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Cat date stamp">
+  <defs>
+    <!-- A “postage stamp” scalloped outline -->
+    <clipPath id="stampClip">
+      <!-- base rounded rect -->
+      <path d="
+        M8 8
+        H92
+        V92
+        H8
+        Z
+      "/>
+
+      <!-- Punch scallops by overlaying circles in the clip path:
+           Trick: clipPath keeps what's inside shapes, so we build the stamp as ONE path instead:
+           Use an SVG path for a scalloped rectangle (precomputed-ish look). -->
+    </clipPath>
+
+    <!-- REAL scalloped rectangle path -->
+    <clipPath id="scallopClip">
+      <path d="
+        M10,8
+        H90
+        Q92,8 92,10
+        V14
+        Q92,16 90,16
+        Q88,16 88,14
+        Q88,12 90,12
+        Q92,12 92,14
+
+        V22
+        Q92,24 90,24
+        Q88,24 88,22
+        Q88,20 90,20
+        Q92,20 92,22
+
+        V30
+        Q92,32 90,32
+        Q88,32 88,30
+        Q88,28 90,28
+        Q92,28 92,30
+
+        V38
+        Q92,40 90,40
+        Q88,40 88,38
+        Q88,36 90,36
+        Q92,36 92,38
+
+        V46
+        Q92,48 90,48
+        Q88,48 88,46
+        Q88,44 90,44
+        Q92,44 92,46
+
+        V54
+        Q92,56 90,56
+        Q88,56 88,54
+        Q88,52 90,52
+        Q92,52 92,54
+
+        V62
+        Q92,64 90,64
+        Q88,64 88,62
+        Q88,60 90,60
+        Q92,60 92,62
+
+        V70
+        Q92,72 90,72
+        Q88,72 88,70
+        Q88,68 90,68
+        Q92,68 92,70
+
+        V78
+        Q92,80 90,80
+        Q88,80 88,78
+        Q88,76 90,76
+        Q92,76 92,78
+
+        V90
+        Q92,92 90,92
+        H10
+        Q8,92 8,90
+
+        V78
+        Q8,76 10,76
+        Q12,76 12,78
+        Q12,80 10,80
+        Q8,80 8,78
+
+        V70
+        Q8,68 10,68
+        Q12,68 12,70
+        Q12,72 10,72
+        Q8,72 8,70
+
+        V62
+        Q8,60 10,60
+        Q12,60 12,62
+        Q12,64 10,64
+        Q8,64 8,62
+
+        V54
+        Q8,52 10,52
+        Q12,52 12,54
+        Q12,56 10,56
+        Q8,56 8,54
+
+        V46
+        Q8,44 10,44
+        Q12,44 12,46
+        Q12,48 10,48
+        Q8,48 8,46
+
+        V38
+        Q8,36 10,36
+        Q12,36 12,38
+        Q12,40 10,40
+        Q8,40 8,38
+
+        V30
+        Q8,28 10,28
+        Q12,28 12,30
+        Q12,32 10,32
+        Q8,32 8,30
+
+        V22
+        Q8,20 10,20
+        Q12,20 12,22
+        Q12,24 10,24
+        Q8,24 8,22
+
+        V14
+        Q8,12 10,12
+        Q12,12 12,14
+        Q12,16 10,16
+        Q8,16 8,14
+
+        V10
+        Q8,8 10,8
+        Z
+      "/>
+    </clipPath>
+  </defs>
+
+  <!-- The HTML content (video + text) clipped by the scalloped shape -->
+  <foreignObject x="0" y="0" width="100" height="100" clip-path="url(#scallopClip)">
+    <div xmlns="http://www.w3.org/1999/xhtml" class="layer">
+      <video autoplay muted loop playsinline
+        style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 45%;">
+        <source src="catvid.mp4" type="video/mp4" />
       </video>
 
       <div class="content">
@@ -131,7 +221,8 @@
         <div class="date" id="dateText">--/--/--</div>
       </div>
     </div>
-  </div>
+  </foreignObject>
+</svg>
 
 <script>
   const d = new Date();
@@ -140,5 +231,6 @@
   const yy = String(d.getFullYear()).slice(-2);
   document.getElementById("dateText").textContent = `${dd}/${mm}/${yy}`;
 </script>
+
 </body>
 </html>
