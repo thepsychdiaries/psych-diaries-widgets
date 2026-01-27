@@ -17,74 +17,58 @@
     background:#f4f4f6;
   }
 
-  /* Make it WAY smaller */
+  /* Smaller widget */
   .stamp{
-    width: 240px;           /* tweak: 200–260 */
+    width: 240px;              /* tweak 200–280 */
     aspect-ratio: 1 / 1;
-    position: relative;
     box-shadow: 0 14px 34px rgba(0,0,0,.22);
   }
 
-  /* This is the actual masked surface */
   .surface{
     width:100%;
     height:100%;
     position: relative;
-    overflow: hidden;
+    overflow:hidden;
 
-    /* Apply SVG mask (real stamp edge) */
+    /* Proper stamp perforation mask */
     -webkit-mask-image: url('data:image/svg+xml;utf8,\
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\
-<path fill="white" d="\
-M10,6 \
-H90 \
-c1.8,0 3.3,1.5 3.3,3.3 \
-c0,1.1-.6,2.1-1.5,2.7 \
-c-2.6,1.6-2.6,5.4,0,7 \
-c.9.6,1.5,1.6,1.5,2.7 \
-V76.3 \
-c0,1.1-.6,2.1-1.5,2.7 \
-c-2.6,1.6-2.6,5.4,0,7 \
-c.9.6,1.5,1.6,1.5,2.7 \
-c0,1.8-1.5,3.3-3.3,3.3 \
-H10 \
-c-1.8,0-3.3-1.5-3.3-3.3 \
-c0-1.1.6-2.1 1.5-2.7 \
-c2.6-1.6 2.6-5.4 0-7 \
-c-.9-.6-1.5-1.6-1.5-2.7 \
-V23.7 \
-c0-1.1.6-2.1 1.5-2.7 \
-c2.6-1.6 2.6-5.4 0-7 \
-c-.9-.6-1.5-1.6-1.5-2.7 \
-C6.7,7.5 8.2,6 10,6 Z\
-"/>\
+  <defs>\
+    <mask id="m">\
+      <rect width="100" height="100" fill="black"/>\
+      <rect x="6" y="6" width="88" height="88" rx="6" ry="6" fill="white"/>\
+      <!-- punch holes around edges -->\
+      <g fill="black">\
+        <!-- top row -->\
+        <circle cx="14" cy="6" r="3.2"/><circle cx="26" cy="6" r="3.2"/><circle cx="38" cy="6" r="3.2"/><circle cx="50" cy="6" r="3.2"/><circle cx="62" cy="6" r="3.2"/><circle cx="74" cy="6" r="3.2"/><circle cx="86" cy="6" r="3.2"/>\
+        <!-- bottom row -->\
+        <circle cx="14" cy="94" r="3.2"/><circle cx="26" cy="94" r="3.2"/><circle cx="38" cy="94" r="3.2"/><circle cx="50" cy="94" r="3.2"/><circle cx="62" cy="94" r="3.2"/><circle cx="74" cy="94" r="3.2"/><circle cx="86" cy="94" r="3.2"/>\
+        <!-- left column -->\
+        <circle cx="6" cy="14" r="3.2"/><circle cx="6" cy="26" r="3.2"/><circle cx="6" cy="38" r="3.2"/><circle cx="6" cy="50" r="3.2"/><circle cx="6" cy="62" r="3.2"/><circle cx="6" cy="74" r="3.2"/><circle cx="6" cy="86" r="3.2"/>\
+        <!-- right column -->\
+        <circle cx="94" cy="14" r="3.2"/><circle cx="94" cy="26" r="3.2"/><circle cx="94" cy="38" r="3.2"/><circle cx="94" cy="50" r="3.2"/><circle cx="94" cy="62" r="3.2"/><circle cx="94" cy="74" r="3.2"/><circle cx="94" cy="86" r="3.2"/>\
+      </g>\
+    </mask>\
+  </defs>\
+  <rect width="100" height="100" fill="white" mask="url(#m)"/>\
 </svg>');
     mask-image: url('data:image/svg+xml;utf8,\
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\
-<path fill="white" d="\
-M10,6 \
-H90 \
-c1.8,0 3.3,1.5 3.3,3.3 \
-c0,1.1-.6,2.1-1.5,2.7 \
-c-2.6,1.6-2.6,5.4,0,7 \
-c.9.6,1.5,1.6,1.5,2.7 \
-V76.3 \
-c0,1.1-.6,2.1-1.5,2.7 \
-c-2.6,1.6-2.6,5.4,0,7 \
-c.9.6,1.5,1.6,1.5,2.7 \
-c0,1.8-1.5,3.3-3.3,3.3 \
-H10 \
-c-1.8,0-3.3-1.5-3.3-3.3 \
-c0-1.1.6-2.1 1.5-2.7 \
-c2.6-1.6 2.6-5.4 0-7 \
-c-.9-.6-1.5-1.6-1.5-2.7 \
-V23.7 \
-c0-1.1.6-2.1 1.5-2.7 \
-c2.6-1.6 2.6-5.4 0-7 \
-c-.9-.6-1.5-1.6-1.5-2.7 \
-C6.7,7.5 8.2,6 10,6 Z\
-"/>\
+  <defs>\
+    <mask id="m">\
+      <rect width="100" height="100" fill="black"/>\
+      <rect x="6" y="6" width="88" height="88" rx="6" ry="6" fill="white"/>\
+      <g fill="black">\
+        <circle cx="14" cy="6" r="3.2"/><circle cx="26" cy="6" r="3.2"/><circle cx="38" cy="6" r="3.2"/><circle cx="50" cy="6" r="3.2"/><circle cx="62" cy="6" r="3.2"/><circle cx="74" cy="6" r="3.2"/><circle cx="86" cy="6" r="3.2"/>\
+        <circle cx="14" cy="94" r="3.2"/><circle cx="26" cy="94" r="3.2"/><circle cx="38" cy="94" r="3.2"/><circle cx="50" cy="94" r="3.2"/><circle cx="62" cy="94" r="3.2"/><circle cx="74" cy="94" r="3.2"/><circle cx="86" cy="94" r="3.2"/>\
+        <circle cx="6" cy="14" r="3.2"/><circle cx="6" cy="26" r="3.2"/><circle cx="6" cy="38" r="3.2"/><circle cx="6" cy="50" r="3.2"/><circle cx="6" cy="62" r="3.2"/><circle cx="6" cy="74" r="3.2"/><circle cx="6" cy="86" r="3.2"/>\
+        <circle cx="94" cy="14" r="3.2"/><circle cx="94" cy="26" r="3.2"/><circle cx="94" cy="38" r="3.2"/><circle cx="94" cy="50" r="3.2"/><circle cx="94" cy="62" r="3.2"/><circle cx="94" cy="74" r="3.2"/><circle cx="94" cy="86" r="3.2"/>\
+      </g>\
+    </mask>\
+  </defs>\
+  <rect width="100" height="100" fill="white" mask="url(#m)"/>\
 </svg>');
+
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
     -webkit-mask-repeat: no-repeat;
@@ -93,7 +77,6 @@ C6.7,7.5 8.2,6 10,6 Z\
     mask-position: center;
   }
 
-  /* Video full opacity, no overlay */
   .surface video{
     position:absolute;
     inset:0;
@@ -101,11 +84,10 @@ C6.7,7.5 8.2,6 10,6 Z\
     height:100%;
     object-fit: cover;
     object-position: center 45%;
-    opacity: 1;
+    opacity:1;
     pointer-events:none;
   }
 
-  /* Text overlay */
   .content{
     position:absolute;
     inset:0;
