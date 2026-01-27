@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Psych Diaries · Pawfect Day</title>
 
-<!-- Prettier fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Momo+Signature&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Momo+Signature&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
   * { box-sizing: border-box; }
@@ -18,10 +17,9 @@
     place-items: center;
   }
 
-  /* ===== SMALL SCALLOPED WIDGET ===== */
   .poster {
     position: relative;
-    width: min(260px, 90vw);   /* <<< MUCH smaller */
+    width: min(260px, 90vw);
     aspect-ratio: 1 / 1;
     overflow: hidden;
 
@@ -39,46 +37,46 @@
     box-shadow: 0 16px 40px rgba(0,0,0,.22);
   }
 
-  /* ===== VIDEO BACKGROUND ===== */
+  /* VIDEO: "move the cat up" by shifting the framing */
   .poster video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 42%; /* cat slightly up */
+    object-position: center 28%; /* LOWER % = cat appears higher */
     opacity: 1;
     pointer-events: none;
   }
 
-  /* ===== CONTENT ===== */
   .content {
     position: relative;
     z-index: 2;
     height: 100%;
-    padding: 26px 18px;
+    padding: 20px 18px 16px;       /* a bit more bottom space control */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between; /* headline top, date bottom */
     text-align: center;
     color: #111;
   }
 
   .headline {
     font-family: "Momo Signature", cursive;
-  font-size: 22px;
-  font-weight: 400; 
-  margin: 0 0 18px;
-
+    font-size: 22px;
+    font-weight: 400;
+    margin: 0;
+    transform: rotate(-1deg);
   }
 
   .date {
     font-family: "Poppins", sans-serif;
-    font-size: 44px;          /* <<< scaled down */
+    font-size: 44px;
     font-weight: 800;
     letter-spacing: .5px;
     line-height: 1;
+    margin: 0;
   }
 
   .headline, .date {
