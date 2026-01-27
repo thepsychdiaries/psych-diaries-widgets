@@ -1,377 +1,196 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Psych Diaries Pomodoro</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Psych Diaries • Cat Calendar</title>
+  <style>
+    :root{
+      --ink:#3a2f2a;
+      --terracotta:#9b4d3f;
+      --beige:#fbf4ea;
+      --shadow:0 14px 40px rgba(0,0,0,.16);
+      --border: rgba(155,77,63,.14);
+    }
 
-<style>
-:root{
-  --ink:#3a2f2a;
-  --terracotta:#9b4d3f;
-  --beige:#fbf4ea;
-  --shadow:0 14px 40px rgba(0,0,0,.16);
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
 
-  /* Fill tints (kept for your existing JS) */
-  --fill-focus:rgba(155,77,63,.12);
-  --fill-break:rgba(179,95,82,.10);
-}
+    body{
+      margin:0;
+      display:grid;
+      place-items:center;
+      background: var(--beige);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--ink);
+    }
 
-*{box-sizing:border-box;}
-html,body{height:100%;}
+    /* Notion-friendly container */
+    .card{
+      width: min(460px, 92vw);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,.40);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      min-height: 320px;
+    }
 
-body{
-  margin:0;
-  display:grid;
-  place-items:center;
-  background:var(--beige);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  color:var(--ink);
-}
+    /* Cat video background INSIDE card */
+    .card-video{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity: .38;              /* tweak: .28–.50 */
+      filter: saturate(1.05);
+      pointer-events:none;
+      z-index:0;
+    }
 
-/* ───────── Card ───────── */
-.card{
-  width:min(460px,92vw);
-  border-radius:28px;
-  background:rgba(255,255,255,.82);
-  border:1px solid rgba(155,77,63,.14);
-  box-shadow:var(--shadow);
-  padding:18px;
-  position:relative;
-  overflow:hidden;
-  backdrop-filter:blur(10px);
-}
+    @media (prefers-reduced-motion: reduce){
+      .card-video{ display:none; }
+    }
 
-/* ───────── Cat video INSIDE card (higher opacity) ───────── */
-.card-video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
+    /* UI */
+    .ui{
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+    }
 
-  /* cat is now focal */
-  opacity:.32;                 /* sweet spot: .28–.36 */
-  filter: blur(.2px) saturate(1.05);
+    .title{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      padding: 2px 4px 10px;
+    }
 
-  pointer-events:none;
-  z-index:0;
-}
+    .brand{
+      font-weight: 700;
+      letter-spacing: .2px;
+      opacity: .9;
+      font-size: 16px;
+    }
 
-/* Motion safety */
-@media (prefers-reduced-motion: reduce){
-  .card-video{display:none;}
-}
+    .dateWrap{
+      display:grid;
+      place-items:center;
+      padding: 26px 10px 18px;
+      margin-top: 10px;
+    }
 
-/* ───────── Progress wash (moved to card) ───────── */
-.fill{
-  position:absolute;
-  inset:auto 0 0 0;
-  height:0%;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0) 0%,
-    var(--fill-focus) 70%,
-    var(--fill-focus) 100%
-  );
-  transition: height .35s ease;
-  pointer-events:none;
-  z-index:0; /* behind UI, above video */
-}
+    .day{
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: .6px;
+      opacity: .85;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(155,77,63,.14);
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(8px);
+    }
 
-/* UI layers above video + fill */
-.top,.content,.controls,.footer{
-  position:relative;
-  z-index:1;
-}
+    .date{
+      margin-top: 14px;
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-shadow:
+        0 2px 14px rgba(255,255,255,.9),
+        0 1px 0 rgba(255,255,255,.8);
+    }
 
-/* ───────── Top row ───────── */
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding-bottom:10px;
-}
-.brand{
-  font-weight:650;
-  font-size:16px;
-}
-.pill{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 12px;
-  border-radius:999px;
-  background:rgba(243,237,231,.85);
-  border:1px solid rgba(155,77,63,.14);
-  font-size:13px;
-}
-.pill input{accent-color:var(--terracotta);}
+    .monthYear{
+      margin-top: 6px;
+      font-size: 18px;
+      letter-spacing: .4px;
+      opacity: .75;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.48);
+      border: 1px solid rgba(155,77,63,.10);
+      backdrop-filter: blur(8px);
+    }
 
-/* ───────── Content / (white box removed) ───────── */
-.content{
-  display:grid;
-  place-items:center;
-  padding:18px 0 10px;
-}
+    .footer{
+      margin-top: auto;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      padding: 10px 6px 2px;
+      font-size: 12px;
+      opacity: .65;
+    }
 
-/* Stage is now just a positioning wrapper */
-.stage{
-  width:100%;
-  min-height:240px;
-  display:grid;
-  place-items:center;
-  position:relative;
-  margin-top:8px;
-}
-
-/* Timer text - readable without a box */
-.time{
-  font-size:64px;
-  font-weight:720;
-  letter-spacing:1px;
-  color:var(--ink);
-  text-shadow:
-    0 2px 12px rgba(255,255,255,.9),
-    0 1px 0 rgba(255,255,255,.8);
-}
-
-/* Mode label (optional subtle pill) */
-.mode{
-  margin-top:10px;
-  font-size:14px;
-  opacity:.75;
-  text-align:center;
-  letter-spacing:.3px;
-}
-.pill-mode{
-  padding:6px 14px;
-  border-radius:999px;
-  background:rgba(255,255,255,.55);
-  backdrop-filter:blur(6px);
-  border:1px solid rgba(155,77,63,.12);
-  display:inline-block;
-}
-
-/* ───────── Controls ───────── */
-.controls{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  padding-top:8px;
-}
-button{
-  border:1px solid rgba(155,77,63,.18);
-  background:rgba(255,255,255,.78);
-  color:var(--ink);
-  padding:10px 14px;
-  border-radius:999px;
-  font-weight:650;
-  cursor:pointer;
-  min-width:108px;
-  backdrop-filter: blur(8px);
-}
-button.primary{
-  background:rgba(155,77,63,.14);
-  border-color:rgba(155,77,63,.26);
-  color:var(--terracotta);
-}
-
-/* ───────── Footer ───────── */
-.footer{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding-top:10px;
-  font-size:12px;
-  opacity:.65;
-}
-.dot{
-  width:7px;height:7px;border-radius:50%;
-  background:rgba(155,77,63,.35);
-  box-shadow:0 0 0 4px rgba(155,77,63,.08);
-}
-</style>
+    .tiny{
+      display:flex; gap:8px; align-items:center;
+    }
+    .dot{
+      width:7px; height:7px; border-radius:999px;
+      background: rgba(155,77,63,.35);
+      box-shadow: 0 0 0 4px rgba(155,77,63,.08);
+    }
+  </style>
 </head>
 
 <body>
+  <div class="card" role="application" aria-label="Calendar widget showing today's date">
+    <video class="card-video" autoplay muted loop playsinline aria-hidden="true">
+      <source src="catvid.mp4" type="video/mp4" />
+    </video>
 
-<div class="card" role="application" aria-label="Pomodoro timer">
+    <div class="ui">
+      <div class="title">
+        <div class="brand">Psych Diaries • Cat Calendar</div>
+      </div>
 
-  <!-- Cat looping background -->
-  <video class="card-video" autoplay muted loop playsinline aria-hidden="true">
-    <source src="catvid.mp4" type="video/mp4">
-  </video>
+      <div class="dateWrap" aria-live="polite">
+        <div id="day" class="day">—</div>
+        <div id="date" class="date">—</div>
+        <div id="monthYear" class="monthYear">—</div>
+      </div>
 
-  <!-- Progress wash layer (now on card, not inside a white box) -->
-  <div id="fill" class="fill"></div>
-
-  <div class="top">
-    <div class="brand">Psych Diaries • Pomodoro</div>
-    <label class="pill" title="Enable/disable sound">
-      <input id="soundToggle" type="checkbox" checked>
-      Sound on
-    </label>
-  </div>
-
-  <div class="content">
-    <div class="stage" aria-label="Timer display">
-      <div>
-        <div id="time" class="time">25:00</div>
-        <div id="mode" class="mode pill-mode">Focus</div>
+      <div class="footer">
+        <div class="tiny"><span class="dot"></span><span id="status">Local date</span></div>
+        <div>© Psych Diaries</div>
       </div>
     </div>
   </div>
 
-  <div class="controls">
-    <button id="startPause" class="primary">Start</button>
-    <button id="reset">Reset</button>
-    <button id="setBreak">Break (5)</button>
-    <button id="setFocus">Focus (25)</button>
-  </div>
+  <script>
+    // Shows the user's local date (based on their device timezone)
+    function renderDate(){
+      const now = new Date();
 
-  <div class="footer">
-    <div style="display:flex;gap:8px;align-items:center;">
-      <span class="dot"></span>
-      <span id="status">Ready</span>
-    </div>
-    <div>© Psych Diaries</div>
-  </div>
+      // Use user's locale automatically; specify weekday/day/month/year formats
+      const day = now.toLocaleDateString(undefined, { weekday: "long" });
+      const dayNum = now.toLocaleDateString(undefined, { day: "numeric" });
+      const monthYear = now.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 
-  <audio id="ding" src="ding.mp3" preload="auto"></audio>
-</div>
-
-<script>
-  // ------- Simple Pomodoro (25/5) with "fill up" progress -------
-  const FOCUS_SECONDS = 25 * 60;
-  const BREAK_SECONDS = 5 * 60;
-
-  const elTime = document.getElementById("time");
-  const elMode = document.getElementById("mode");
-  const elStatus = document.getElementById("status");
-  const elFill = document.getElementById("fill");
-
-  const btnStartPause = document.getElementById("startPause");
-  const btnReset = document.getElementById("reset");
-  const btnSetBreak = document.getElementById("setBreak");
-  const btnSetFocus = document.getElementById("setFocus");
-
-  const ding = document.getElementById("ding");
-  const soundToggle = document.getElementById("soundToggle");
-
-  let mode = "focus"; // "focus" | "break"
-  let duration = FOCUS_SECONDS;
-  let remaining = duration;
-  let running = false;
-  let timerId = null;
-
-  function fmt(sec){
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-  }
-
-  function setMode(nextMode){
-    mode = nextMode;
-    duration = (mode === "focus") ? FOCUS_SECONDS : BREAK_SECONDS;
-    remaining = duration;
-    running = false;
-    stopTimer();
-
-    elMode.textContent = (mode === "focus") ? "Focus" : "Break";
-    elStatus.textContent = "Ready";
-    btnStartPause.textContent = "Start";
-    updateUI();
-
-    // Adjust fill tint for focus vs break (keeps your original behavior)
-    document.documentElement.style.setProperty(
-      "--fill-focus",
-      mode === "focus" ? "rgba(155, 77, 63, .12)" : "rgba(179, 95, 82, .10)"
-    );
-    elFill.style.background = mode === "focus"
-      ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(155, 77, 63, .12) 70%, rgba(155, 77, 63, .12) 100%)"
-      : "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(179, 95, 82, .10) 70%, rgba(179, 95, 82, .10) 100%)";
-  }
-
-  function updateUI(){
-    elTime.textContent = fmt(remaining);
-
-    const progress = (duration - remaining) / duration; // 0..1
-    const pct = Math.max(0, Math.min(100, progress * 100));
-    elFill.style.height = `${pct}%`;
-  }
-
-  function playDing(){
-    if (!soundToggle.checked) return;
-    ding.currentTime = 0;
-    ding.play().catch(() => {});
-  }
-
-  function tick(){
-    if (!running) return;
-    remaining -= 1;
-    if (remaining <= 0){
-      remaining = 0;
-      updateUI();
-      playDing();
-      running = false;
-      stopTimer();
-      btnStartPause.textContent = "Start";
-      elStatus.textContent = "Done!";
-      return;
-    }
-    updateUI();
-  }
-
-  function startTimer(){
-    if (running) return;
-    running = true;
-    elStatus.textContent = "Running…";
-    timerId = setInterval(tick, 1000);
-  }
-
-  function stopTimer(){
-    if (timerId){
-      clearInterval(timerId);
-      timerId = null;
-    }
-  }
-
-  function reset(){
-    running = false;
-    stopTimer();
-    remaining = duration;
-    elStatus.textContent = "Ready";
-    btnStartPause.textContent = "Start";
-    updateUI();
-  }
-
-  // --- Button wiring ---
-  btnStartPause.addEventListener("click", () => {
-    // Ensure audio is "unlocked" after first click in some browsers:
-    if (soundToggle.checked) {
-      ding.play().then(() => { ding.pause(); ding.currentTime = 0; }).catch(()=>{});
+      document.getElementById("day").textContent = day;
+      document.getElementById("date").textContent = dayNum;
+      document.getElementById("monthYear").textContent = monthYear;
     }
 
-    if (!running){
-      startTimer();
-      btnStartPause.textContent = "Pause";
-    } else {
-      running = false;
-      stopTimer();
-      elStatus.textContent = "Paused";
-      btnStartPause.textContent = "Start";
-    }
-  });
+    renderDate();
 
-  btnReset.addEventListener("click", reset);
-  btnSetBreak.addEventListener("click", () => setMode("break"));
-  btnSetFocus.addEventListener("click", () => setMode("focus"));
-
-  // Initialize UI
-  setMode("focus");
-</script>
-
+    // Update shortly after midnight (cheap + reliable)
+    setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 2) {
+        renderDate();
+      }
+    }, 1000);
+  </script>
 </body>
 </html>
